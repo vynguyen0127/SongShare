@@ -1,22 +1,25 @@
 package com.example.songshare.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.Post;
+import com.example.songshare.PostsAdapter;
 import com.example.songshare.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,45 +29,23 @@ import java.util.List;
  */
 public class FeedFragment extends Fragment {
 
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
+
 
     RecyclerView rvPosts;
+    PostsAdapter adapter;
+    List<Post> allPosts;
+    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
+    private static final String REDIRECT_URI = "http://localhost:8888/";
+
     public FeedFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * param param1 Parameter 1.
-     * param param2 Parameter 2.
-     * @return A new instance of fragment FeedFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-//    public static FeedFragment newInstance(String param1, String param2) {
-//        FeedFragment fragment = new FeedFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
+
     }
 
     @Override
@@ -80,23 +61,38 @@ public class FeedFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
 
 
+        allPosts = new ArrayList<>();
+        adapter = new PostsAdapter(getContext(), allPosts);
+
+        rvPosts.setAdapter(adapter);
+        rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
+        queryPosts();
+
     }
 
-    private void queryPosts(){
+    private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
-                if(e != null){
+                if (e != null) {
                     Log.e("FeedFragment", "Issue getting posts: " + e.toString());
                     return;
                 }
 
-                for(Post post : posts){
-                    Log.i("FeedFragment", "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername());
+                for (Post post : posts) {
+                    Log.i("FeedFragment", "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongID());
                 }
-
+                allPosts.addAll(posts);
+                adapter.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
     }
 }
