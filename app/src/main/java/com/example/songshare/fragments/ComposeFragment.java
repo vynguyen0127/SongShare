@@ -1,59 +1,61 @@
 package com.example.songshare.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.songshare.MainActivity;
 import com.example.songshare.R;
+import com.example.songshare.Song;
+import com.example.songshare.SongAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ComposeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class ComposeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = "ComposeFragment";
+    EditText etSearch;
+    ImageButton ibSearch;
+    RecyclerView rvResults;
+    List<Song> songs;
+    SongAdapter adapter;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private String mAccessToken;
 
     public ComposeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ComposeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ComposeFragment newInstance(String param1, String param2) {
-        ComposeFragment fragment = new ComposeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -62,4 +64,82 @@ public class ComposeFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_compose, container, false);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
+        super.onViewCreated(view,savedInstanceState);
+
+        etSearch = view.findViewById(R.id.etSearch);
+        ibSearch = view.findViewById(R.id.ibSearch);
+        rvResults = view.findViewById(R.id.rvResults);
+
+        songs = new ArrayList<>();
+        adapter = new SongAdapter(getContext(),songs);
+
+        rvResults.setAdapter(adapter);
+        rvResults.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        ibSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "Search clicked!");
+                makeRequest(etSearch.getText().toString());
+            }
+        });
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        adapter.disconnect();
+    }
+
+    public void makeRequest (String query) {
+        mAccessToken = ((MainActivity)this.getActivity()).getAccessToken();
+
+        if (mAccessToken == null) {
+            Log.e(TAG,"no token");
+            return;
+        }
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/search").newBuilder();
+        urlBuilder.addQueryParameter("q", query);
+        urlBuilder.addQueryParameter("type", "track");
+        String url = urlBuilder.build().toString();
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.i(TAG,"onFailure");
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+                    JSONObject json2 = new JSONObject(json.getString("tracks"));
+
+                    JSONArray array = new JSONArray(json2.getString("items"));
+
+                    songs.addAll(Song.fromJsonArray(array));
+//                    adapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    Log.i(TAG,e.toString());
+                }
+
+            }
+
+        });
+
+    }
+
+
 }

@@ -19,21 +19,22 @@ import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.types.Track;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
-    public static final String TAG = "PostAdapter";
-
+    List<Song> songs;
     Context context;
-    List<Post> posts;
     SpotifyAppRemote remote;
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
+    public static final String TAG = "SongAdapter";
 
-    public PostsAdapter(Context context, List<Post> posts){
+    public SongAdapter(Context context, List<Song> songs){
         this.context = context;
-        this.posts = posts;
+        this.songs = songs;
 
         ConnectionParams connectionParams =
                 new ConnectionParams.Builder(CLIENT_ID)
@@ -50,7 +51,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         Log.d(TAG, "Connected! Yay!");
 
                         // Now you can start interacting with App Remote
-
+//                        connected();
                     }
 
                     @Override
@@ -61,79 +62,59 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 });
     }
 
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_post,parent,false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull PostsAdapter.ViewHolder holder, int position) {
-        Post post = posts.get(position);
-        holder.bind(post);
-    }
-
-    @Override
-    public int getItemCount() {
-        return posts.size();
-    }
-    // Clean all elements of the recycler
-    public void clear() {
-        posts.clear();
-        notifyDataSetChanged();
-    }
-
     public void disconnect(){
         Log.i(TAG,"disconnecting remote");
         SpotifyAppRemote.disconnect(remote);
     }
-
-    // Add a list of items -- change to type used
-    public void addAll(List<Post> list) {
-        posts.addAll(list);
-        notifyDataSetChanged();
+    @NonNull
+    @NotNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_song,parent,false);
+        return new ViewHolder(view);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    @Override
+    public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
+        Song song = songs.get(position);
+        holder.bind(song);
+    }
 
+    @Override
+    public int getItemCount() {
+        return songs.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView ivAlbum;
         TextView tvSongTitle;
-        TextView tvUsername;
         TextView tvArtist;
         ImageButton ibPlay;
-        ImageView ivAlbum;
-        TextView tvCaption;
 
-
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
+
+            ivAlbum = itemView.findViewById(R.id.ivAlbum);
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
-            tvUsername = itemView.findViewById(R.id.tvUsername);
             tvArtist = itemView.findViewById(R.id.tvArtist);
             ibPlay = itemView.findViewById(R.id.ibPlay);
-            ivAlbum = itemView.findViewById(R.id.ivAlbum);
-            tvCaption = itemView.findViewById(R.id.tvCaption);
-
-            itemView.setOnClickListener(this);
         }
 
-        public void bind(Post post) {
+        public void bind(Song song) {
             Glide.with(context)
-                    .load(post.getAlbumURL())
+                    .load(song.getAlbumUrl())
                     .into(ivAlbum);
 
-            tvUsername.setText(post.getUser().getUsername());
-            tvCaption.setText(post.getCaption());
-            tvSongTitle.setText(post.getSongTitle());
-            tvArtist.setText(post.getArtist());
+            tvSongTitle.setText(song.getSongTitle());
+            tvArtist.setText(song.getArtistName());
 
 
 
             ibPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    remote.getPlayerApi().play(post.getSongID());
+                    remote.getPlayerApi().play(song.getSongId());
                     remote.getPlayerApi()
                             .subscribeToPlayerState()
                             .setEventCallback(playerState -> {
@@ -144,21 +125,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                             });
 
                     Log.i(TAG, "Play clicked!");
-                    Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Now playing: " + song.getSongTitle(), Toast.LENGTH_LONG).show();
 
                 }
             });
 
-        }
 
-        @Override
-        public void onClick(View view){
-            Log.i(TAG,"post clicked!");
-            int position =  getAdapterPosition();
-
-            if(position != RecyclerView.NO_POSITION){
-
-            }
         }
     }
 }

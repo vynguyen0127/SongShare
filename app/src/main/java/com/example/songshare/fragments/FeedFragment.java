@@ -22,20 +22,14 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FeedFragment newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class FeedFragment extends Fragment {
 
 
-
+    public static final String TAG = "FeedFragment";
     RecyclerView rvPosts;
     PostsAdapter adapter;
     List<Post> allPosts;
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String REDIRECT_URI = "http://localhost:8888/";
 
     public FeedFragment() {
         // Required empty public constructor
@@ -59,6 +53,7 @@ public class FeedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rvPosts = view.findViewById(R.id.rvPosts);
+        // Set the connection parameters
 
 
         allPosts = new ArrayList<>();
@@ -73,16 +68,17 @@ public class FeedFragment extends Fragment {
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
+        query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
                 if (e != null) {
-                    Log.e("FeedFragment", "Issue getting posts: " + e.toString());
+                    Log.e("TAG", "Issue getting posts: " + e.toString());
                     return;
                 }
 
                 for (Post post : posts) {
-                    Log.i("FeedFragment", "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongID());
+                    Log.i("TAG", "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongID());
                 }
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
@@ -93,6 +89,6 @@ public class FeedFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        adapter.disconnect();
     }
 }

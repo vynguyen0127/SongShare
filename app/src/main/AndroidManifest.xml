@@ -23,6 +23,9 @@
         <activity android:name=".MainActivity">
 
         </activity>
+        <activity
+            android:name="com.spotify.sdk.android.auth.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 
 </manifest>
