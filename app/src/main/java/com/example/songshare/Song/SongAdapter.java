@@ -1,4 +1,4 @@
-package com.example.songshare;
+package com.example.songshare.Song;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,10 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Track;
+import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
+import com.spotify.android.appremote.api.error.NotLoggedInException;
+import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +39,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.context = context;
         this.songs = songs;
 
+        connectRemote();
+    }
+
+    public void connectRemote(){
         ConnectionParams connectionParams =
                 new ConnectionParams.Builder(CLIENT_ID)
                         .setRedirectUri(REDIRECT_URI)
@@ -49,23 +56,37 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-
+//                        Toast.makeText(context,"Connected! Yay!",Toast.LENGTH_SHORT).show();
                         // Now you can start interacting with App Remote
-//                        connected();
+
                     }
 
                     @Override
                     public void onFailure(Throwable throwable) {
                         Log.e(TAG, throwable.getMessage(), throwable);
                         // Something went wrong when attempting to connect! Handle errors here
+
+                        // Occurs when Spotify app not downloaded
+                        if(throwable instanceof CouldNotFindSpotifyApp){
+                            Toast.makeText(context,"WARNING: Spotify App not downloaded, please download the app and try again.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User is not logged in to Spotify App
+                        else if(throwable instanceof NotLoggedInException){
+                            Toast.makeText(context,"WARNING: User is not logged into Spotify App.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User does not give app permission to access Spotify Account
+                        else if(throwable instanceof UserNotAuthorizedException){
+                            Toast.makeText(context,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
     }
 
-    public void disconnect(){
+    public void disconnectRemote(){
         Log.i(TAG,"disconnecting remote");
         SpotifyAppRemote.disconnect(remote);
     }
+
     @NonNull
     @NotNull
     @Override
@@ -91,6 +112,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         TextView tvSongTitle;
         TextView tvArtist;
         ImageButton ibPlay;
+        ImageButton ibAdd;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -110,22 +132,22 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             tvArtist.setText(song.getArtistName());
 
 
-
             ibPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     remote.getPlayerApi().play(song.getSongId());
-                    remote.getPlayerApi()
-                            .subscribeToPlayerState()
-                            .setEventCallback(playerState -> {
-                                final Track track = playerState.track;
-                                if (track != null) {
-                                    Log.d(TAG, track.name + " by " + track.artist.name);
-                                }
-                            });
+                    ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
+//                    remote.getPlayerApi()
+//                            .subscribeToPlayerState()
+//                            .setEventCallback(playerState -> {
+//                                final Track track = playerState.track;
+//                                if (track != null) {
+//                                    Log.d(TAG, track.name + " by " + track.artist.name);
+//                                }
+//                            });
 
                     Log.i(TAG, "Play clicked!");
-                    Toast.makeText(context,"Now playing: " + song.getSongTitle(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by " + song.getArtistName(), Toast.LENGTH_LONG).show();
 
                 }
             });

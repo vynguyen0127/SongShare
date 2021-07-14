@@ -1,4 +1,4 @@
-package com.example.songshare;
+package com.example.songshare.Post;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;

@@ -12,12 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.songshare.Post;
-import com.example.songshare.PostsAdapter;
+import com.example.songshare.Post.Post;
+import com.example.songshare.Post.PostsAdapter;
 import com.example.songshare.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class FeedFragment extends Fragment {
     RecyclerView rvPosts;
     PostsAdapter adapter;
     List<Post> allPosts;
+    static SpotifyAppRemote remote;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -50,13 +52,19 @@ public class FeedFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        adapter.connectRemote();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rvPosts = view.findViewById(R.id.rvPosts);
         // Set the connection parameters
 
-
         allPosts = new ArrayList<>();
+
         adapter = new PostsAdapter(getContext(), allPosts);
 
         rvPosts.setAdapter(adapter);
@@ -73,12 +81,12 @@ public class FeedFragment extends Fragment {
             @Override
             public void done(List<Post> posts, ParseException e) {
                 if (e != null) {
-                    Log.e("TAG", "Issue getting posts: " + e.toString());
+                    Log.e(TAG, "Issue getting posts: " + e.toString());
                     return;
                 }
 
                 for (Post post : posts) {
-                    Log.i("TAG", "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongID());
+                    Log.i(TAG, "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongTitle());
                 }
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
@@ -89,6 +97,9 @@ public class FeedFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        adapter.disconnect();
+        adapter.disconnectRemote();
     }
+
+
+
 }

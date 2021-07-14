@@ -1,6 +1,8 @@
 package com.example.songshare.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
-import com.example.songshare.Song;
-import com.example.songshare.SongAdapter;
+import com.example.songshare.Song.Song;
+import com.example.songshare.Song.SongAdapter;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -66,6 +68,24 @@ public class ComposeFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        adapter.connectRemote();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        etSearch.setText("");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        adapter.disconnectRemote();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view,savedInstanceState);
 
@@ -83,19 +103,16 @@ public class ComposeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "Search clicked!");
-                makeRequest(etSearch.getText().toString());
+                makeRequest();
             }
         });
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        adapter.disconnect();
-    }
 
-    public void makeRequest (String query) {
+    private void makeRequest () {
+        String query = etSearch.getText().toString();
+
         mAccessToken = ((MainActivity)this.getActivity()).getAccessToken();
 
         if (mAccessToken == null) {
@@ -103,16 +120,25 @@ public class ComposeFragment extends Fragment {
             return;
         }
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/search").newBuilder();
-        urlBuilder.addQueryParameter("q", query);
-        urlBuilder.addQueryParameter("type", "track");
-        String url = urlBuilder.build().toString();
+        String url = getUrl(query);
 
         final Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
 
+        call(request);
+
+    }
+    private String getUrl(String query){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/search").newBuilder();
+        urlBuilder.addQueryParameter("q", query);
+        urlBuilder.addQueryParameter("type", "track");
+        String url = urlBuilder.build().toString();
+        return url;
+    }
+
+    private void call(Request request){
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -128,8 +154,12 @@ public class ComposeFragment extends Fragment {
 
                     JSONArray array = new JSONArray(json2.getString("items"));
 
+                    if(!songs.isEmpty()){
+                        songs.clear();
+                    }
                     songs.addAll(Song.fromJsonArray(array));
-//                    adapter.notifyDataSetChanged();
+                    notifyAdapter();
+
 
                 } catch (JSONException e) {
                     Log.i(TAG,e.toString());
@@ -138,8 +168,22 @@ public class ComposeFragment extends Fragment {
             }
 
         });
-
     }
+
+    private void notifyAdapter(){
+        Log.i(TAG,"Notifying SongAdapter");
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                //Update UI
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
+
 
 
 }

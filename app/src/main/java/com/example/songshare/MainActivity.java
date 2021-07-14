@@ -11,12 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.songshare.Post.Post;
 import com.example.songshare.fragments.ComposeFragment;
 import com.example.songshare.fragments.FeedFragment;
 import com.example.songshare.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -28,22 +30,23 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "http://localhost:8888/";
     private static final int REQUEST_CODE = 1337;
     private String accessToken;
-
+    static SpotifyAppRemote remote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("MainActivity", "Main opened!");
         setContentView(R.layout.activity_main);
+
         ParseObject.registerSubclass(Post.class);
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
-        builder.setScopes(new String[]{"streaming"});
-        AuthorizationRequest request = builder.build();
-        AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+
+        Fragment feedFragment = new FeedFragment();
+        Fragment profileFragment = new ProfileFragment();
+        Fragment composeFragment = new ComposeFragment();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -53,20 +56,20 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_home:
 //                        Toast.makeText(MainActivity.this, "Home!",Toast.LENGTH_SHORT).show();
                         // do something here
-                        fragment = new FeedFragment();
+                        fragment = feedFragment;
                         break;
                     case R.id.action_profile:
 //                        Toast.makeText(MainActivity.this, "Profile!",Toast.LENGTH_SHORT).show();
                         // do something here
-                        fragment = new ProfileFragment();;
+                        fragment = profileFragment;
                         break;
                     case R.id.action_search:
 //                        Toast.makeText(MainActivity.this, "Compose!",Toast.LENGTH_SHORT).show();
                         // do something here
-                        fragment = new ComposeFragment();
+                        fragment = composeFragment;
                         break;
                     default:
-                        fragment = new FeedFragment();
+                        fragment = feedFragment;
 
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer,fragment).commit();
@@ -75,8 +78,20 @@ public class MainActivity extends AppCompatActivity {
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
 
+        authorizeAccount();
+
     }
 
+
+    public void authorizeAccount(){
+        // Log in to Spotify Account to receive authorization
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
+        builder.setScopes(new String[]{"streaming"}); // need to add additional scopes to modify user's playlists
+        AuthorizationRequest request = builder.build();
+        AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
+    }
+
+    // Result of LoginActivity
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
@@ -89,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
                 case TOKEN:
                     Log.i(TAG,"Token retrieved");
                     // Handle successful response
+
+                    // Need access token to make calls to Spotify Web API
                     accessToken = response.getAccessToken();
                     break;
 
@@ -105,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 

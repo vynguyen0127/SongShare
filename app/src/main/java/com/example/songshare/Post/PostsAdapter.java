@@ -1,6 +1,7 @@
-package com.example.songshare;
+package com.example.songshare.Post;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,27 +15,35 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.songshare.OnSwipeTouchListener;
+import com.example.songshare.PostDetailActivity;
+import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Track;
+import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
+import com.spotify.android.appremote.api.error.NotLoggedInException;
+import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
-    public static final String TAG = "PostAdapter";
+    public static final String TAG = "PostsAdapter";
 
     Context context;
     List<Post> posts;
     SpotifyAppRemote remote;
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
-
     public PostsAdapter(Context context, List<Post> posts){
         this.context = context;
         this.posts = posts;
 
+        connectRemote();
+    }
+
+    public void connectRemote(){
         ConnectionParams connectionParams =
                 new ConnectionParams.Builder(CLIENT_ID)
                         .setRedirectUri(REDIRECT_URI)
@@ -48,7 +57,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-
+//                        Toast.makeText(context,"Connected! Yay!",Toast.LENGTH_SHORT).show();
                         // Now you can start interacting with App Remote
 
                     }
@@ -57,10 +66,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     public void onFailure(Throwable throwable) {
                         Log.e(TAG, throwable.getMessage(), throwable);
                         // Something went wrong when attempting to connect! Handle errors here
+
+                        // Occurs when Spotify app not downloaded
+                        if(throwable instanceof CouldNotFindSpotifyApp){
+                            Toast.makeText(context,"WARNING: Spotify App not downloaded, please download the app and try again.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User is not logged in to Spotify App
+                        else if(throwable instanceof NotLoggedInException){
+                            Toast.makeText(context,"WARNING: User is not logged into Spotify App.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User does not give app permission to access Spotify Account
+                        else if(throwable instanceof UserNotAuthorizedException){
+                            Toast.makeText(context,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
     }
-
 
     @NonNull
     @Override
@@ -85,7 +106,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void disconnect(){
+    public void disconnectRemote(){
         Log.i(TAG,"disconnecting remote");
         SpotifyAppRemote.disconnect(remote);
     }
@@ -96,7 +117,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvSongTitle;
         TextView tvUsername;
@@ -116,9 +137,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvCaption = itemView.findViewById(R.id.tvCaption);
 
             itemView.setOnClickListener(this);
+            itemView.setOnTouchListener(new OnSwipeTouchListener(context) {
+
+                @Override
+                public void onSwipeRight() {
+                    // Whatever
+                    Log.i(TAG,"Swipe right detected");
+                    Intent i = new Intent(context, PostDetailActivity.class);
+                    context.startActivity(i);
+                }
+            });
         }
 
         public void bind(Post post) {
+
             Glide.with(context)
                     .load(post.getAlbumURL())
                     .into(ivAlbum);
@@ -129,19 +161,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvArtist.setText(post.getArtist());
 
 
-
             ibPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(remote == null){
+                        Toast.makeText(context, "Unable to connect to Spotify App",Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     remote.getPlayerApi().play(post.getSongID());
-                    remote.getPlayerApi()
-                            .subscribeToPlayerState()
-                            .setEventCallback(playerState -> {
-                                final Track track = playerState.track;
-                                if (track != null) {
-                                    Log.d(TAG, track.name + " by " + track.artist.name);
-                                }
-                            });
+//                    remote.getPlayerApi()
+//                            .subscribeToPlayerState()
+//                            .setEventCallback(playerState -> {
+//                                final Track track = playerState.track;
+//                                if (track != null) {
+//                                    Log.d(TAG, track.name + " by " + track.artist.name);
+//                                }
+//                            });
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();
@@ -157,7 +192,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             int position =  getAdapterPosition();
 
             if(position != RecyclerView.NO_POSITION){
-
+//                Log.i(TAG,"Swipe left detected");
+//                Intent i = new Intent(context, PostDetailActivity.class);
+//                context.startActivity(i);
             }
         }
     }
