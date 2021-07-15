@@ -9,7 +9,7 @@
     android:layout_marginEnd="15dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="#E1D39F"
+    card_view:cardBackgroundColor="#E46691"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="8dp">
 
@@ -21,6 +21,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivCover"
+                android:layout_width="@dimen/album_cover_dimen"
+                android:layout_height="@dimen/album_cover_dimen"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                tools:srcCompat="@tools:sample/avatars" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -39,13 +50,6 @@
                     android:textStyle="bold"
                     tools:text="Title" />
 
-                <TextView
-                    android:id="@+id/tvArtist"
-                    android:layout_width="@dimen/title_width"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginEnd="15dp"
-                    tools:text="Artist" />
             </LinearLayout>
 
             <FrameLayout
@@ -54,32 +58,9 @@
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_margin="3dp">
 
-                <ImageView
-                    android:id="@+id/ivCover"
-                    android:layout_width="@dimen/album_cover_dimen"
-                    android:layout_height="@dimen/album_cover_dimen"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    tools:srcCompat="@tools:sample/avatars" />
-
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="@dimen/btn_play_dimen"
-                    android:layout_height="@dimen/btn_play_dimen"
-                    android:layout_gravity="center"
-                    card_view:srcCompat="@android:drawable/ic_media_play" />
-
             </FrameLayout>
 
         </LinearLayout>
-
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

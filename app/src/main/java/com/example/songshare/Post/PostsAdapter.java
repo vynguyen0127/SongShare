@@ -1,7 +1,7 @@
 package com.example.songshare.Post;
 
 import android.content.Context;
-import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.example.songshare.PostDetailActivity;
 import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
@@ -128,10 +127,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
+            tvSongTitle = itemView.findViewById(R.id.tvPlaylistName);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvArtist = itemView.findViewById(R.id.tvArtist);
-            ivAlbum = itemView.findViewById(R.id.ivAlbum);
+            ivAlbum = itemView.findViewById(R.id.ivCover);
             tvCaption = itemView.findViewById(R.id.tvCaption);
             tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
 
@@ -161,25 +160,41 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     }
                     remote.getPlayerApi().play(post.getSongID());
 
+                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            // change image
+//
+//                            remote.getPlayerApi().seekToRelativePosition(32500);
+//                            Log.i(TAG,"fast forwarded");
+//
+//                        }
+//
+//                    }, 200);
+
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();
+                    handler.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // change image
+                            remote.getPlayerApi().pause();
+                        }
+
+                    }, 10000);
 
                 }
             });
 
         }
 
-        @Override
-        public void onClick(View view){
-            Log.i(TAG,"post clicked!");
-            int position =  getAdapterPosition();
 
-            if(position != RecyclerView.NO_POSITION){
-                Post post = posts.get(position);
-                Intent i = new Intent(context, PostDetailActivity.class);
-                i.putExtra("Post",post);
-                context.startActivity(i);
-            }
+        @Override
+        public void onClick(View v) {
+
         }
     }
 }

@@ -94,7 +94,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_song,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_song_alt,parent,false);
         return new ViewHolder(view);
     }
 
@@ -118,8 +118,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
 
-            ivAlbum = itemView.findViewById(R.id.ivAlbum);
-            tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
+            ivAlbum = itemView.findViewById(R.id.ivCover);
+            tvSongTitle = itemView.findViewById(R.id.tvPlaylistName);
             tvArtist = itemView.findViewById(R.id.tvArtist);
 
 
@@ -140,7 +140,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     remote.getPlayerApi().play(song.getSongId());
-
+                    remote.getPlayerApi().seekToRelativePosition(35000);
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by " + song.getArtistName(), Toast.LENGTH_LONG).show();

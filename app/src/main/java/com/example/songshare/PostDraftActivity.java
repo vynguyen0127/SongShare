@@ -1,6 +1,7 @@
 package com.example.songshare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,8 +40,8 @@ public class PostDraftActivity extends AppCompatActivity {
 
         song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
 
-        ivAlbum = findViewById(R.id.ivAlbum);
-        tvSongTitle = findViewById(R.id.tvSongTitle);
+        ivAlbum = findViewById(R.id.ivCover);
+        tvSongTitle = findViewById(R.id.tvPlaylistName);
         tvArtist = findViewById(R.id.tvArtist);
         btnPost = findViewById(R.id.btnPost);
         etCaption = findViewById(R.id.etCaption);
@@ -80,6 +81,8 @@ public class PostDraftActivity extends AppCompatActivity {
                 }
                 Log.i(TAG,"Post save was successful!" );
                 etCaption.setText("");
+                Intent i = new Intent(PostDraftActivity.this, MainActivity.class);
+                startActivity(i);
                 finish();
             }
         });

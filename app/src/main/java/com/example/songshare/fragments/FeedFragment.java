@@ -1,5 +1,6 @@
 package com.example.songshare.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.songshare.MainActivity;
 import com.example.songshare.Post.Post;
 import com.example.songshare.Post.PostsAdapter;
+import com.example.songshare.PostDetailActivity;
 import com.example.songshare.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -36,6 +39,8 @@ public class FeedFragment extends Fragment {
     RecyclerView rvPosts;
     PostsAdapter adapter;
     List<Post> allPosts;
+    String mAccessToken;
+
     private SwipeRefreshLayout swipeContainer;
     static SpotifyAppRemote remote;
 
@@ -68,7 +73,6 @@ public class FeedFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rvPosts = view.findViewById(R.id.rvPosts);
-        // Set the connection parameters
 
         allPosts = new ArrayList<>();
 
@@ -87,6 +91,7 @@ public class FeedFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
+                allPosts.clear();
                 queryPosts();
                 swipeContainer.setRefreshing(false);
             }
@@ -98,6 +103,7 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        mAccessToken = ((MainActivity)this.getActivity()).getAccessToken();
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
 
     }
@@ -137,7 +143,20 @@ public class FeedFragment extends Fragment {
 
         @Override
         public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-            Toast.makeText(getContext(),"Swipe!", Toast.LENGTH_SHORT).show();
+            if(direction == ItemTouchHelper.RIGHT) {
+
+                Post post = allPosts.get(viewHolder.getAdapterPosition());
+                Toast.makeText(getContext(), "Swiped right on " + post.getSongTitle() + "!" , Toast.LENGTH_SHORT).show();
+                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+                Intent i = new Intent(getContext(), PostDetailActivity.class);
+                i.putExtra("Post",post);
+                i.putExtra("Token",mAccessToken);
+
+                startActivity(i);
+            }
+            else {
+                Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
+            }
 
             // add song to Spotify Playlist
         }

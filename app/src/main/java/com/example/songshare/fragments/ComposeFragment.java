@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.MainActivity;
@@ -49,7 +50,7 @@ public class ComposeFragment extends Fragment {
     SongAdapter adapter;
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
-    private String mAccessToken;
+    private String accessToken;
 
     public ComposeFragment() {
         // Required empty public constructor
@@ -99,15 +100,29 @@ public class ComposeFragment extends Fragment {
         adapter = new SongAdapter(getContext(),songs);
 
         rvResults.setAdapter(adapter);
-        rvResults.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
+//        rvResults.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ibSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "Search clicked!");
                 makeRequest();
-                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                mgr.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+            }
+        });
+
+        etSearch.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    makeRequest();
+
+                    return true;
+                }
+                return false;
             }
         });
 
@@ -115,11 +130,15 @@ public class ComposeFragment extends Fragment {
 
 
     private void makeRequest () {
+        // make keyboard disappear
+        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+
         String query = etSearch.getText().toString();
 
-        mAccessToken = ((MainActivity)this.getActivity()).getAccessToken();
+        accessToken = ((MainActivity)this.getActivity()).getAccessToken();
 
-        if (mAccessToken == null) {
+        if (accessToken == null) {
             Log.e(TAG,"no token");
             return;
         }
@@ -128,7 +147,7 @@ public class ComposeFragment extends Fragment {
 
         final Request request = new Request.Builder()
                 .url(url)
-                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .addHeader("Authorization", "Bearer " + accessToken)
                 .build();
 
         call(request);

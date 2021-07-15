@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization
         AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
-        builder.setScopes(new String[]{"streaming"}); // need to add additional scopes to modify user's playlists
+        builder.setScopes(new String[]{"streaming","playlist-read-private","playlist-modify-public","playlist-modify-private"}); // need to add additional scopes to modify user's playlists
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
     }
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     public String getAccessToken(){
         return accessToken;
     }
+
 
 
 }

@@ -41,7 +41,7 @@
                     tools:text="Username" />
 
                 <TextView
-                    android:id="@+id/tvSongTitle"
+                    android:id="@+id/tvPlaylistName"
                     android:layout_width="@dimen/title_width_land"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
@@ -67,7 +67,7 @@
                 android:layout_margin="3dp">
 
                 <ImageView
-                    android:id="@+id/ivAlbum"
+                    android:id="@+id/ivCover"
                     android:layout_width="@dimen/album_cover_dimen"
                     android:layout_height="@dimen/album_cover_dimen"
                     android:layout_marginTop="5dp"
