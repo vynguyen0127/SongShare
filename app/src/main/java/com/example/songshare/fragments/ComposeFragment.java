@@ -1,5 +1,6 @@
 package com.example.songshare.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -104,6 +106,8 @@ public class ComposeFragment extends Fragment {
             public void onClick(View v) {
                 Log.i(TAG, "Search clicked!");
                 makeRequest();
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
             }
         });
 

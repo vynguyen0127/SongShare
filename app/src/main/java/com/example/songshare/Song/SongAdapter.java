@@ -1,6 +1,7 @@
 package com.example.songshare.Song;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.songshare.PostDraftActivity;
 import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
@@ -23,6 +25,7 @@ import com.spotify.android.appremote.api.error.NotLoggedInException;
 import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -106,7 +109,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return songs.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView ivAlbum;
         TextView tvSongTitle;
@@ -121,6 +124,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
             tvArtist = itemView.findViewById(R.id.tvArtist);
             ibPlay = itemView.findViewById(R.id.ibPlay);
+
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Song song) {
@@ -136,7 +141,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     remote.getPlayerApi().play(song.getSongId());
-                    ibPlay.setImageResource(R.drawable.ic_baseline_pause_24);
 //                    remote.getPlayerApi()
 //                            .subscribeToPlayerState()
 //                            .setEventCallback(playerState -> {
@@ -153,6 +157,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             });
 
 
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            Log.i(TAG,"Song clicked!");
+            if(position != RecyclerView.NO_POSITION){
+                Song song = songs.get(position);
+                Intent i = new Intent(context, PostDraftActivity.class);
+                i.putExtra("Song", Parcels.wrap(song));
+                context.startActivity(i);
+            }
         }
     }
 }

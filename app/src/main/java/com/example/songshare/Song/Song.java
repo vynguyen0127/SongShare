@@ -5,16 +5,21 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Parcel
 public class Song {
 
     private String albumUrl;
     private String artistName;
     private String songTitle;
     private String songId;
+
+    Song(){}
+    
     Song(JSONObject jsonObject){
         try {
             JSONObject json4 = new JSONObject(jsonObject.getString("album"));
