@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -122,9 +121,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         TextView tvSongTitle;
         TextView tvUsername;
         TextView tvArtist;
-        ImageButton ibPlay;
         ImageView ivAlbum;
         TextView tvCaption;
+        TextView tvCreatedAt;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -134,6 +133,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvArtist = itemView.findViewById(R.id.tvArtist);
             ivAlbum = itemView.findViewById(R.id.ivAlbum);
             tvCaption = itemView.findViewById(R.id.tvCaption);
+            tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
 
             itemView.setOnClickListener(this);
         }
@@ -149,6 +149,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvCaption.setText(post.getCaption());
             tvSongTitle.setText(post.getSongTitle());
             tvArtist.setText(post.getArtist());
+            tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));
 
 
             ivAlbum.setOnClickListener(new View.OnClickListener() {

@@ -3,6 +3,6 @@
     <dimen name="btn_play_dimen">50dp</dimen>
     <dimen name="album_cover_dimen">90dp</dimen>
     <dimen name="title_width">210dp</dimen>
-    <dimen name="title_width_land">500dp</dimen>
+    <dimen name="title_width_land">550dp</dimen>
     <dimen name="btn_play_dimen_land">75dp</dimen>
 </resources>
