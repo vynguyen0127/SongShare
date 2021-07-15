@@ -12,4 +12,5 @@ public class PostDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_detail);
 
     }
+    
 }

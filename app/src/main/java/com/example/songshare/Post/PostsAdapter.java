@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.songshare.OnSwipeTouchListener;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.PostDetailActivity;
 import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
@@ -132,27 +132,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvArtist = itemView.findViewById(R.id.tvArtist);
-            ibPlay = itemView.findViewById(R.id.ibPlay);
             ivAlbum = itemView.findViewById(R.id.ivAlbum);
             tvCaption = itemView.findViewById(R.id.tvCaption);
 
             itemView.setOnClickListener(this);
-            itemView.setOnTouchListener(new OnSwipeTouchListener(context) {
-
-                @Override
-                public void onSwipeRight() {
-                    // Whatever
-                    Log.i(TAG,"Swipe right detected");
-                    Intent i = new Intent(context, PostDetailActivity.class);
-                    context.startActivity(i);
-                }
-            });
         }
 
         public void bind(Post post) {
 
             Glide.with(context)
                     .load(post.getAlbumURL())
+                    .transform(new RoundedCorners(20))
                     .into(ivAlbum);
 
             tvUsername.setText(post.getUser().getUsername());
@@ -161,7 +151,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvArtist.setText(post.getArtist());
 
 
-            ibPlay.setOnClickListener(new View.OnClickListener() {
+            ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(remote == null){
@@ -169,14 +159,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         return;
                     }
                     remote.getPlayerApi().play(post.getSongID());
-//                    remote.getPlayerApi()
-//                            .subscribeToPlayerState()
-//                            .setEventCallback(playerState -> {
-//                                final Track track = playerState.track;
-//                                if (track != null) {
-//                                    Log.d(TAG, track.name + " by " + track.artist.name);
-//                                }
-//                            });
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();
@@ -192,9 +174,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             int position =  getAdapterPosition();
 
             if(position != RecyclerView.NO_POSITION){
-//                Log.i(TAG,"Swipe left detected");
-//                Intent i = new Intent(context, PostDetailActivity.class);
-//                context.startActivity(i);
+                Post post = posts.get(position);
+                Intent i = new Intent(context, PostDetailActivity.class);
+                i.putExtra("Post",post);
+                context.startActivity(i);
             }
         }
     }

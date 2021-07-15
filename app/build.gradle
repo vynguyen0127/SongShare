@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.r0adkll:slidableactivity:2.1.0'
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
+    implementation "androidx.cardview:cardview:1.0.0"
 }

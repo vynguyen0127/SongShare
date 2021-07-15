@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.PostDraftActivity;
 import com.example.songshare.R;
 import com.spotify.android.appremote.api.ConnectionParams;
@@ -59,7 +59,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-//                        Toast.makeText(context,"Connected! Yay!",Toast.LENGTH_SHORT).show();
+
                         // Now you can start interacting with App Remote
 
                     }
@@ -114,8 +114,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         ImageView ivAlbum;
         TextView tvSongTitle;
         TextView tvArtist;
-        ImageButton ibPlay;
-        ImageButton ibAdd;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -123,7 +121,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             ivAlbum = itemView.findViewById(R.id.ivAlbum);
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
             tvArtist = itemView.findViewById(R.id.tvArtist);
-            ibPlay = itemView.findViewById(R.id.ibPlay);
+
 
             itemView.setOnClickListener(this);
         }
@@ -131,24 +129,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         public void bind(Song song) {
             Glide.with(context)
                     .load(song.getAlbumUrl())
+                    .transform(new RoundedCorners(20))
                     .into(ivAlbum);
 
             tvSongTitle.setText(song.getSongTitle());
             tvArtist.setText(song.getArtistName());
 
 
-            ibPlay.setOnClickListener(new View.OnClickListener() {
+            ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     remote.getPlayerApi().play(song.getSongId());
-//                    remote.getPlayerApi()
-//                            .subscribeToPlayerState()
-//                            .setEventCallback(playerState -> {
-//                                final Track track = playerState.track;
-//                                if (track != null) {
-//                                    Log.d(TAG, track.name + " by " + track.artist.name);
-//                                }
-//                            });
+
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by " + song.getArtistName(), Toast.LENGTH_LONG).show();
