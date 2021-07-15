@@ -103,12 +103,13 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        mAccessToken = ((MainActivity)this.getActivity()).getAccessToken();
+
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
 
     }
 
     private void queryPosts() {
+        Log.i(TAG,"getting posts");
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.addDescendingOrder("createdAt");
@@ -128,7 +129,9 @@ public class FeedFragment extends Fragment {
             }
         });
     }
-
+    private String fetchToken(){
+        return ((MainActivity)this.getActivity()).getAccessToken();
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -144,18 +147,20 @@ public class FeedFragment extends Fragment {
         @Override
         public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
             if(direction == ItemTouchHelper.RIGHT) {
-
+                mAccessToken= fetchToken();
                 Post post = allPosts.get(viewHolder.getAdapterPosition());
                 Toast.makeText(getContext(), "Swiped right on " + post.getSongTitle() + "!" , Toast.LENGTH_SHORT).show();
                 rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
                 Intent i = new Intent(getContext(), PostDetailActivity.class);
                 i.putExtra("Post",post);
                 i.putExtra("Token",mAccessToken);
+                Log.i(TAG,"token: " + mAccessToken);
 
                 startActivity(i);
             }
             else {
                 Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
+                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
             }
 
             // add song to Spotify Playlist

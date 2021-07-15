@@ -7,6 +7,9 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -67,6 +70,7 @@ public class ComposeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_compose, container, false);
     }
 
@@ -128,7 +132,27 @@ public class ComposeFragment extends Fragment {
 
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
 
+        inflater.inflate(R.menu.menu_main,menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+//        if(item.getItemId() == R.id.logOut){
+//            ParseUser.logOut();
+//            ParseUser currentUser = ParseUser.getCurrentUser();
+//            Intent i = new Intent(getContext(), LoginActivity.class);
+//            startActivity(i);
+//            finish();
+//        }
+        return super.onOptionsItemSelected(item);
+    }
     private void makeRequest () {
         // make keyboard disappear
         InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -156,7 +180,7 @@ public class ComposeFragment extends Fragment {
     private String getUrl(String query){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/search").newBuilder();
         urlBuilder.addQueryParameter("q", query);
-        urlBuilder.addQueryParameter("type", "track");
+        urlBuilder.addQueryParameter("type", "track,artists");
         String url = urlBuilder.build().toString();
         return url;
     }

@@ -5,4 +5,5 @@
     <string name="log_out">Log Out</string>
     <string name="search_hint">Search for a song</string>
     <string name="todo">TODO</string>
+    <string name="playlist_hint">Choose a playlist to add to: </string>
 </resources>

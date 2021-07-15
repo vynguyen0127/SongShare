@@ -17,6 +17,7 @@ import com.example.songshare.Playlist.PlaylistAdapter;
 import com.example.songshare.Post.Post;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -78,7 +79,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private void makeRequest() {
         String url = getUrl();
-
+        Log.i(TAG, "token:" + accessToken);
         final Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + accessToken)
@@ -107,14 +108,15 @@ public class PostDetailActivity extends AppCompatActivity {
                 try {
                     String responseData = response.body().string();
                     JSONObject json = new JSONObject(responseData);
-
-                    Log.i(TAG, json.toString());
+                    JSONArray array  = new JSONArray(json.get("items").toString());
+//                    JSONObject json2 = new JSONObject(array.getJSONObject(0).toString());
+//                    Log.i(TAG, json2.toString());
 
 //                    if(!playlists.isEmpty()){
 //                        playlists.clear();
 //                    }
-//                    playlists.addAll(Playlist.fromJsonArray(array));
-//                    notifyAdapter();
+                    playlists.addAll(Playlist.fromJsonArray(array));
+                    notifyAdapter();
 
 
                 } catch (JSONException e) {
@@ -127,7 +129,7 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void notifyAdapter(){
-        Log.i(TAG,"Notifying SongAdapter");
+        Log.i(TAG,"Notifying Playlist");
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(new Runnable() {
             @Override

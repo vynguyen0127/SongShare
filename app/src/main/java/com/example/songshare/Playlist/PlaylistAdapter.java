@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_post,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_playlist,parent,false);
         return new ViewHolder(view);
     }
 
@@ -66,6 +67,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
             tvPlaylistName.setText(playlist.getPlaylistName());
             Glide.with(context)
                     .load(playlist.getCoverUrl())
+                    .transform(new RoundedCorners(20))
                     .into(ivCover);
 
         }

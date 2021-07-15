@@ -1,6 +1,9 @@
 package com.example.songshare.Playlist;
 
+import android.util.Log;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -10,16 +13,38 @@ public class Playlist {
 
     private String playlistId;
     private String coverUrl;
-    private String ownerId;
+    private String ownerUri;
     private String playlistName;
-
+    public static final String TAG = "Playlist";
     Playlist(){}
 
-    Playlist(JSONObject jsonObject){}
+    Playlist(JSONObject jsonObject){
+        try {
+            JSONArray imagesArray = new JSONArray(jsonObject.get("images").toString());
+            JSONObject imageObject = new JSONObject(imagesArray.get(0).toString());
+            coverUrl = imageObject.getString("url");
+
+            playlistName = jsonObject.getString("name");
+            playlistId = jsonObject.getString("id");
+
+            JSONObject ownerObject = jsonObject.getJSONObject("owner");
+            ownerUri = ownerObject.getString("uri");
+            Log.i(TAG,"Cover: " + coverUrl + ", Playlist: " + playlistName + ", Id: " + playlistId + ", Owner: " + ownerUri);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+    }
 
     public static List<Playlist> fromJsonArray(JSONArray jsonArray){
         List<Playlist> playlists = new ArrayList<>();
+        for(int i = 0; i < jsonArray.length(); i++){
+            try {
+                playlists.add(new Playlist(jsonArray.getJSONObject(i)));
 
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
         return playlists;
     }
 
@@ -31,8 +56,8 @@ public class Playlist {
         return coverUrl;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getOwnerUri() {
+        return ownerUri;
     }
 
     public String getPlaylistName() {
