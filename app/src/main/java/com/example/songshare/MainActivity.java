@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.songshare.Post.Post;
-import com.example.songshare.fragments.ComposeFragment;
+import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.fragments.FeedFragment;
 import com.example.songshare.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment feedFragment = new FeedFragment();
         Fragment profileFragment = new ProfileFragment();
-        Fragment composeFragment = new ComposeFragment();
+        Fragment composeFragment = new SearchFragment();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override

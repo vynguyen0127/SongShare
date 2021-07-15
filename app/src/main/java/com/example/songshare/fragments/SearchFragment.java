@@ -7,9 +7,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -43,7 +40,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class ComposeFragment extends Fragment {
+public class SearchFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
     EditText etSearch;
@@ -55,7 +52,7 @@ public class ComposeFragment extends Fragment {
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private String accessToken;
 
-    public ComposeFragment() {
+    public SearchFragment() {
         // Required empty public constructor
     }
 
@@ -71,7 +68,7 @@ public class ComposeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_compose, container, false);
+        return inflater.inflate(R.layout.fragment_search, container, false);
     }
 
     @Override
@@ -105,7 +102,6 @@ public class ComposeFragment extends Fragment {
 
         rvResults.setAdapter(adapter);
         rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
-//        rvResults.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ibSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,27 +128,6 @@ public class ComposeFragment extends Fragment {
 
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
-
-        inflater.inflate(R.menu.menu_main,menu);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-//        if(item.getItemId() == R.id.logOut){
-//            ParseUser.logOut();
-//            ParseUser currentUser = ParseUser.getCurrentUser();
-//            Intent i = new Intent(getContext(), LoginActivity.class);
-//            startActivity(i);
-//            finish();
-//        }
-        return super.onOptionsItemSelected(item);
-    }
     private void makeRequest () {
         // make keyboard disappear
         InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -180,7 +155,8 @@ public class ComposeFragment extends Fragment {
     private String getUrl(String query){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/search").newBuilder();
         urlBuilder.addQueryParameter("q", query);
-        urlBuilder.addQueryParameter("type", "track,artists");
+        urlBuilder.addQueryParameter("limit","50");
+        urlBuilder.addQueryParameter("type", "track");
         String url = urlBuilder.build().toString();
         return url;
     }
@@ -225,6 +201,7 @@ public class ComposeFragment extends Fragment {
             public void run() {
                 //Update UI
                 adapter.notifyDataSetChanged();
+                rvResults.smoothScrollToPosition(0);
             }
         });
     }

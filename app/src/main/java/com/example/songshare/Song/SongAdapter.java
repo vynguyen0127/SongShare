@@ -22,6 +22,7 @@ import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
 import com.spotify.android.appremote.api.error.NotLoggedInException;
+import com.spotify.android.appremote.api.error.SpotifyConnectionTerminatedException;
 import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.jetbrains.annotations.NotNull;
@@ -80,6 +81,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                         // Occurs when User does not give app permission to access Spotify Account
                         else if(throwable instanceof UserNotAuthorizedException){
                             Toast.makeText(context,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when app cannot connect to Spotify app
+                        else if(throwable instanceof SpotifyConnectionTerminatedException){
+                            Toast.makeText(context,"WARNING: Connection to Spotify app has been terminated. Please restart the app and try again.", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -143,7 +148,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     remote.getPlayerApi().seekToRelativePosition(35000);
 
                     Log.i(TAG, "Play clicked!");
-                    Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by " + song.getArtistName(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by "
+                            + song.getArtistName(), Toast.LENGTH_LONG).show();
 
                 }
             });
