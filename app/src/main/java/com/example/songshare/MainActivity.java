@@ -12,17 +12,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.songshare.Post.Post;
-import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.fragments.FeedFragment;
 import com.example.songshare.fragments.ProfileFragment;
+import com.example.songshare.fragments.SearchFragment;
+import com.example.songshare.models.Post;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = "http://localhost:8888/";
     private static final int REQUEST_CODE = 1337;
     private String accessToken;
-    static SpotifyAppRemote remote;
+    private String currentUserUri;
 
     private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private","user-library-read"
                         ,"user-library-read","playlist-read-collaborative"};
-    private static final String SCOPES2 = "streaming,playlist-read-private,playlist-modify-public," +
-            "playlist-modify-private,user-read-private,user-library-read,playlist-read-collaborative";
+    private OkHttpClient okHttpClient = new OkHttpClient();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,17 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_home:
-//                        Toast.makeText(MainActivity.this, "Home!",Toast.LENGTH_SHORT).show();
                         // do something here
                         fragment = feedFragment;
                         break;
                     case R.id.action_profile:
-//                        Toast.makeText(MainActivity.this, "Profile!",Toast.LENGTH_SHORT).show();
                         // do something here
                         fragment = profileFragment;
                         break;
                     case R.id.action_search:
-//                        Toast.makeText(MainActivity.this, "Compose!",Toast.LENGTH_SHORT).show();
                         // do something here
                         fragment = composeFragment;
                         break;
@@ -93,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization
         AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
-        builder.setScopes(new String[]{SCOPES2}); // need to add additional scopes to modify user's playlists
+        builder.setScopes(SCOPES); // need to add additional scopes to modify user's playlists
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
     }
@@ -114,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Need access token to make calls to Spotify Web API
                     accessToken = response.getAccessToken();
+                    getUserUri();
                     break;
 
                 // Auth flow returned an error
@@ -128,6 +138,38 @@ public class MainActivity extends AppCompatActivity {
                     // Handle other cases
             }
         }
+    }
+
+    private void getUserUri() {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/me").newBuilder();
+        String url = urlBuilder.build().toString();
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.i(TAG,"onFailure");
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+                    currentUserUri = json.getString("uri");
+
+
+                } catch (JSONException e) {
+                    Log.i(TAG,e.toString());
+                }
+            }
+
+        });
     }
 
 
@@ -156,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         return accessToken;
     }
 
+    public String getCurrentUserUri(){return currentUserUri;}
 
 
 }

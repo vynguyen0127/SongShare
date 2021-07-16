@@ -35,19 +35,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="10dp"
-                    android:textColor="@color/black"
+                    android:fontFamily="@font/baloo"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     tools:text="Username" />
 
                 <TextView
-                    android:id="@+id/tvPlaylistName"
+                    android:id="@+id/tvTitle"
                     android:layout_width="@dimen/title_width"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="15dp"
-                    android:textSize="16sp"
+                    android:fontFamily="@font/baloo"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     tools:text="Title" />
 
@@ -58,6 +60,7 @@
                     android:layout_marginStart="25dp"
                     android:layout_marginEnd="15dp"
                     android:layout_marginBottom="15dp"
+                    android:fontFamily="@font/baloo"
                     tools:text="Artist" />
             </LinearLayout>
 
@@ -102,6 +105,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="10dp"
+            android:fontFamily="@font/baloo"
             tools:text="this is my favorite song!1!!">
 
         </TextView>
@@ -113,6 +117,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:fontFamily="@font/baloo"
             android:textSize="12sp"
             tools:text="2 days ago" />
 

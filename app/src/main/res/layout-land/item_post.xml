@@ -41,7 +41,7 @@
                     tools:text="Username" />
 
                 <TextView
-                    android:id="@+id/tvPlaylistName"
+                    android:id="@+id/tvTitle"
                     android:layout_width="@dimen/title_width_land"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"

@@ -1,28 +1,29 @@
 package com.example.songshare.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
-import com.example.songshare.Song.Song;
-import com.example.songshare.Song.SongAdapter;
+import com.example.songshare.adapters.SongAdapter;
+import com.example.songshare.models.Song;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -43,11 +44,10 @@ import okhttp3.Response;
 public class SearchFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
-    EditText etSearch;
-    ImageButton ibSearch;
-    RecyclerView rvResults;
-    List<Song> songs;
-    SongAdapter adapter;
+    private RecyclerView rvResults;
+    private List<Song> songs;
+    private SongAdapter adapter;
+    private ProgressBar progress;
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private String accessToken;
@@ -80,7 +80,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        etSearch.setText("");
     }
 
     @Override
@@ -93,8 +92,6 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view,savedInstanceState);
 
-        etSearch = view.findViewById(R.id.etSearch);
-        ibSearch = view.findViewById(R.id.ibSearch);
         rvResults = view.findViewById(R.id.rvResults);
 
         songs = new ArrayList<>();
@@ -103,37 +100,43 @@ public class SearchFragment extends Fragment {
         rvResults.setAdapter(adapter);
         rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
 
-        ibSearch.setOnClickListener(new View.OnClickListener() {
+        progress = (ProgressBar) view.findViewById(R.id.progress);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_search, menu);
+        final MenuItem searchItem = menu.findItem(R.id.app_bar_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View v) {
-                Log.i(TAG, "Search clicked!");
-                makeRequest();
+            public boolean onQueryTextSubmit(String query) {
+                // Fetch the data remotely
+                makeRequest(query);
+                // Reset SearchView
+                searchView.clearFocus();
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                searchItem.collapseActionView();
+
+                return true;
             }
-        });
 
-        etSearch.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // Perform action on key press
-                    makeRequest();
-
-                    return true;
-                }
+            public boolean onQueryTextChange(String s) {
                 return false;
             }
         });
 
     }
 
-    private void makeRequest () {
-        // make keyboard disappear
-        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
 
-        String query = etSearch.getText().toString();
+    private void makeRequest (String query) {
+
+        progress.setVisibility(ProgressBar.VISIBLE);
 
         accessToken = ((MainActivity)this.getActivity()).getAccessToken();
 
@@ -171,6 +174,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 try {
+
                     String responseData = response.body().string();
                     JSONObject json = new JSONObject(responseData);
                     JSONObject json2 = new JSONObject(json.getString("tracks"));
@@ -183,11 +187,19 @@ public class SearchFragment extends Fragment {
                     songs.addAll(Song.fromJsonArray(array));
                     notifyAdapter();
 
+                    Handler mainHandler = new Handler(Looper.getMainLooper());
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Update UI
+                            progress.setVisibility(ProgressBar.GONE);
+                        }
+                    });
+
 
                 } catch (JSONException e) {
                     Log.i(TAG,e.toString());
                 }
-
             }
 
         });

@@ -1,4 +1,4 @@
-package com.example.songshare.Post;
+package com.example.songshare.models;
 
 import android.util.Log;
 
@@ -28,7 +28,7 @@ public class Post extends ParseObject {
         return getParseUser(KEY_USER);
     }
 
-    public String getSongID(){
+    public String getSongId(){
         return getString(KEY_SONGID);
     }
 
@@ -52,7 +52,7 @@ public class Post extends ParseObject {
         put(KEY_USER,user);
     }
 
-    public void setSongID(String songID){
+    public void setSongId(String songID){
         put(KEY_SONGID,songID);
     }
 

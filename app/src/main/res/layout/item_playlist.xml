@@ -9,7 +9,7 @@
     android:layout_marginEnd="15dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="#E46691"
+    card_view:cardBackgroundColor="@color/purple_700"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="8dp">
 
@@ -22,26 +22,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/ivCover"
-                android:layout_width="@dimen/album_cover_dimen"
-                android:layout_height="@dimen/album_cover_dimen"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
-                android:clickable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                tools:srcCompat="@tools:sample/avatars" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/purple_500">
+
+                <ImageView
+                    android:id="@+id/ivCover"
+                    android:layout_width="@dimen/album_cover_dimen"
+                    android:layout_height="@dimen/album_cover_dimen"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    tools:srcCompat="@tools:sample/avatars" />
+            </FrameLayout>
 
             <TextView
-                android:id="@+id/tvPlaylistName"
+                android:id="@+id/tvTitle"
                 android:layout_width="@dimen/title_width"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="15dp"
-                android:textSize="16sp"
+                android:fontFamily="@font/baloo"
+                android:textColor="@color/white"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 tools:text="Title" />
 

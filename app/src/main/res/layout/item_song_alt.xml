@@ -10,7 +10,7 @@
     android:layout_marginEnd="10dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="#E8E49A"
+    card_view:cardBackgroundColor="@color/yellow_light"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="8dp">
 
@@ -47,11 +47,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#EFDF55"
+            android:background="@color/yellow_dark"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvPlaylistName"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

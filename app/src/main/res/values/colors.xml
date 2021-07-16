@@ -17,4 +17,17 @@
     <color name="cream">#fdfcdc</color>
     <color name="peach_light">#fed9b7</color>
     <color name="salmon">#f07167</color>
+    <color name="yellow_light">#E8E49A</color>
+    <color name="yellow_dark">#EFDF55</color>
+
+    <!--   palette 2  -->
+    <color name="pink_lavender">#CDB4DB</color>
+    <color name="pink_lavender2">#E6BEDC</color>
+    <color name="orchid_pink">#FFC8DD</color>
+    <color name="nadeshiko_pink">#FFAFCC</color>
+    <color name="uranian_blue">#BDE0FE</color>
+    <color name="baby_blue_eyes">#A2D2FF</color>
+
+
+
 </resources>

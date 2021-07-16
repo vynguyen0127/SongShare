@@ -1,4 +1,4 @@
-package com.example.songshare.Playlist;
+package com.example.songshare.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.R;
+import com.example.songshare.models.Playlist;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,17 +60,24 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
 
-            tvPlaylistName = itemView.findViewById(R.id.tvPlaylistName);
+            tvPlaylistName = itemView.findViewById(R.id.tvTitle);
             ivCover = itemView.findViewById(R.id.ivCover);
         }
 
         public void bind(Playlist playlist){
             tvPlaylistName.setText(playlist.getPlaylistName());
-            Glide.with(context)
-                    .load(playlist.getCoverUrl())
-                    .transform(new RoundedCorners(20))
-                    .into(ivCover);
-
+            if(!playlist.getCoverUrl().isEmpty()) {
+                Glide.with(context)
+                        .load(playlist.getCoverUrl())
+                        .transform(new RoundedCorners(20))
+                        .into(ivCover);
+            }
+            else{
+                Glide.with(context)
+                        .load(R.drawable.ic_baseline_audiotrack_24)
+                        .transform(new RoundedCorners(20))
+                        .into(ivCover);
+            }
         }
     }
 

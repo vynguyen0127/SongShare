@@ -2,10 +2,13 @@ package com.example.songshare.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,14 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.songshare.MainActivity;
-import com.example.songshare.Post.Post;
-import com.example.songshare.Post.PostsAdapter;
-import com.example.songshare.PostDetailActivity;
+import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
+import com.example.songshare.adapters.PostsAdapter;
+import com.example.songshare.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,13 +38,13 @@ public class FeedFragment extends Fragment {
 
 
     public static final String TAG = "FeedFragment";
-    RecyclerView rvPosts;
-    PostsAdapter adapter;
-    List<Post> allPosts;
-    String mAccessToken;
-
+    private RecyclerView rvPosts;
+    private PostsAdapter adapter;
+    private List<Post> allPosts;
+    private String accessToken;
+    private ProgressBar progress;
     private SwipeRefreshLayout swipeContainer;
-    static SpotifyAppRemote remote;
+
 
     public FeedFragment() {
         // Required empty public constructor
@@ -80,6 +82,7 @@ public class FeedFragment extends Fragment {
 
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
+        progress = (ProgressBar) view.findViewById(R.id.progress);
         queryPosts();
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
@@ -109,6 +112,7 @@ public class FeedFragment extends Fragment {
     }
 
     private void queryPosts() {
+        progress.setVisibility(ProgressBar.VISIBLE);
         Log.i(TAG,"getting posts");
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
@@ -126,12 +130,23 @@ public class FeedFragment extends Fragment {
                 }
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Update UI
+                        progress.setVisibility(ProgressBar.GONE);
+                    }
+                });
             }
         });
     }
     private String fetchToken(){
         return ((MainActivity)this.getActivity()).getAccessToken();
     }
+
+    private String fetchUserUri(){ return ((MainActivity)this.getActivity()).getCurrentUserUri(); }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -147,15 +162,17 @@ public class FeedFragment extends Fragment {
         @Override
         public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
             if(direction == ItemTouchHelper.RIGHT) {
-                mAccessToken= fetchToken();
-                Post post = allPosts.get(viewHolder.getAdapterPosition());
-                Toast.makeText(getContext(), "Swiped right on " + post.getSongTitle() + "!" , Toast.LENGTH_SHORT).show();
-                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
-                Intent i = new Intent(getContext(), PostDetailActivity.class);
-                i.putExtra("Post",post);
-                i.putExtra("Token",mAccessToken);
-                Log.i(TAG,"token: " + mAccessToken);
+                accessToken = fetchToken();
+                final String uri = fetchUserUri();
 
+                Post post = allPosts.get(viewHolder.getAdapterPosition());
+
+                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+
+                Intent i = new Intent(getContext(), PlaylistAddActivity.class);
+                i.putExtra("Post",post);
+                i.putExtra("Token", accessToken);
+                i.putExtra("Uri",uri);
                 startActivity(i);
             }
             else {

@@ -1,4 +1,4 @@
-package com.example.songshare.Playlist;
+package com.example.songshare.models;
 
 import android.util.Log;
 
@@ -18,11 +18,16 @@ public class Playlist {
     public static final String TAG = "Playlist";
     Playlist(){}
 
-    Playlist(JSONObject jsonObject){
+    public Playlist(JSONObject jsonObject){
         try {
             JSONArray imagesArray = new JSONArray(jsonObject.get("images").toString());
-            JSONObject imageObject = new JSONObject(imagesArray.get(0).toString());
-            coverUrl = imageObject.getString("url");
+            if(!imagesArray.isNull(0)) {
+                JSONObject imageObject = new JSONObject(imagesArray.get(0).toString());
+                coverUrl = imageObject.getString("url");
+            }
+            else{
+                coverUrl = "";
+            }
 
             playlistName = jsonObject.getString("name");
             playlistId = jsonObject.getString("id");
@@ -63,4 +68,6 @@ public class Playlist {
     public String getPlaylistName() {
         return playlistName;
     }
+
+
 }

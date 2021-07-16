@@ -15,8 +15,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.example.songshare.Post.Post;
-import com.example.songshare.Song.Song;
+import com.example.songshare.models.Post;
+import com.example.songshare.models.Song;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -41,7 +41,7 @@ public class PostDraftActivity extends AppCompatActivity {
         song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
 
         ivAlbum = findViewById(R.id.ivCover);
-        tvSongTitle = findViewById(R.id.tvPlaylistName);
+        tvSongTitle = findViewById(R.id.tvTitle);
         tvArtist = findViewById(R.id.tvArtist);
         btnPost = findViewById(R.id.btnPost);
         etCaption = findViewById(R.id.etCaption);
@@ -71,7 +71,7 @@ public class PostDraftActivity extends AppCompatActivity {
         post.setSongTitle(song.getSongTitle());
         post.setArtist(song.getArtistName());
         post.setAlbumUrl(song.getAlbumUrl());
-        post.setSongID(song.getSongId());
+        post.setSongId(song.getSongId());
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
