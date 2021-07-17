@@ -37,15 +37,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private List<Song> songs;
     private Context context;
     private SpotifyAppRemote remote;
+    Boolean temp;
 
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
 
     public static final String TAG = "SongAdapter";
 
-    public SongAdapter(Context context, List<Song> songs){
+    public SongAdapter(Context context, List<Song> songs,Boolean temp){
         this.context = context;
         this.songs = songs;
+        this.temp = temp;
 
         connectRemote();
     }
@@ -103,7 +105,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_song_alt,parent,false);
+        View view = LayoutInflater.from(context).
+                inflate((temp ? R.layout.item_song_alt : R.layout.item_song),parent,false);
         return new ViewHolder(view);
     }
 
@@ -138,7 +141,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         public void bind(Song song) {
             Glide.with(context)
                     .load(song.getAlbumUrl())
-                    .transform(new RoundedCorners(20))
+                    .transform(new RoundedCorners(30))
                     .into(ivAlbum);
 
             tvSongTitle.setText(song.getSongTitle());

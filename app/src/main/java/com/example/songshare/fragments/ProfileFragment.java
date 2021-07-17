@@ -76,11 +76,10 @@ public class ProfileFragment extends Fragment {
         Log.i(TAG,"profile view created");
         rvTopSongs = view.findViewById(R.id.rvTopSongs);
         tvTitle2 = view.findViewById(R.id.tvTitle2);
-        ivProfile = view.findViewById(R.id.ivProfileImage);
         tvUsername = view.findViewById(R.id.tvUsername);
 
         topSongs = new ArrayList<>();
-        adapter = new SongAdapter(getContext(),topSongs);
+        adapter = new SongAdapter(getContext(),topSongs,true);
 
         rvTopSongs.setAdapter(adapter);
         rvTopSongs.setLayoutManager(new GridLayoutManager(getContext(),2));

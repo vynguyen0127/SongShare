@@ -19,12 +19,19 @@ public class Song {
     private String songUri;
 
     Song(){}
+
+    public Song(String albumUrl, String artistName, String songTitle, String songUri){
+        this.albumUrl = albumUrl;
+        this.artistName = artistName;
+        this.songTitle = songTitle;
+        this.songUri = songUri;
+    }
     
     Song(JSONObject jsonObject){
         try {
             JSONObject json4 = new JSONObject(jsonObject.getString("album"));
             JSONArray array2 = new JSONArray(json4.getString("images"));
-            JSONObject json5 = new JSONObject(array2.get(1).toString());
+            JSONObject json5 = new JSONObject(array2.get(0).toString());
             albumUrl = json5.getString("url").toString();
 
             JSONArray array3 = new JSONArray(jsonObject.getString("artists"));

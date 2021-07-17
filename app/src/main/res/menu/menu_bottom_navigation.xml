@@ -8,6 +8,11 @@
         android:title="home"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_recommend"
+        android:icon="@drawable/ic_baseline_audiotrack_24"
+        android:title="recommend"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_search"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_search_24"

@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.songshare.fragments.FeedFragment;
 import com.example.songshare.fragments.ProfileFragment;
+import com.example.songshare.fragments.RecommendFragment;
 import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.models.Post;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment feedFragment;
     Fragment profileFragment;
     Fragment searchFragment;
+    Fragment recommendFragment;
     private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private"
                         ,"user-library-read","playlist-read-collaborative","user-top-read"};
 
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         feedFragment = new FeedFragment();
         profileFragment = new ProfileFragment();
         searchFragment = new SearchFragment();
+        recommendFragment = new RecommendFragment();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -85,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_search:
                         // do something here
                         fragment = searchFragment;
+                        break;
+                    case R.id.action_recommend:
+                        fragment = recommendFragment;
                         break;
                     default:
                         fragment = feedFragment;
