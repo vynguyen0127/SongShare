@@ -71,7 +71,7 @@ public class PostDraftActivity extends AppCompatActivity {
         post.setSongTitle(song.getSongTitle());
         post.setArtist(song.getArtistName());
         post.setAlbumUrl(song.getAlbumUrl());
-        post.setSongId(song.getSongId());
+        post.setSongId(song.getSongUri());
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {

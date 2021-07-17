@@ -123,7 +123,6 @@ public class PlaylistAddActivity extends AppCompatActivity {
                         String collab = object.getString("collaborative");
 
                         if(Objects.equals(uri, currentUserUri) || Objects.equals(collab, "true")){
-                            Log.i(TAG, "uri: " + uri + ", current uri: " + currentUserUri);
                             playlists.add(new Playlist(object));
                         }
                     }
@@ -171,6 +170,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 Log.i(TAG,response.toString());
+
             }
         });
 

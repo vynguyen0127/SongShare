@@ -80,7 +80,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-//                        Toast.makeText(context,"Connected! Yay!",Toast.LENGTH_SHORT).show();
+
                         // Now you can start interacting with App Remote
 
                     }
@@ -159,8 +159,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         return;
                     }
                     remote.getPlayerApi().play(post.getSongId());
-
-
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();

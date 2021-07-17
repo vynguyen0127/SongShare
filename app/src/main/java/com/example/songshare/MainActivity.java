@@ -45,8 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private String accessToken;
     private String currentUserUri;
 
-    private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private","user-library-read"
-                        ,"user-library-read","playlist-read-collaborative"};
+    Fragment feedFragment;
+    Fragment profileFragment;
+    Fragment searchFragment;
+    private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private"
+                        ,"user-library-read","playlist-read-collaborative","user-top-read"};
+
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     @Override
@@ -61,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
 
-        Fragment feedFragment = new FeedFragment();
-        Fragment profileFragment = new ProfileFragment();
-        Fragment composeFragment = new SearchFragment();
+        feedFragment = new FeedFragment();
+        profileFragment = new ProfileFragment();
+        searchFragment = new SearchFragment();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_search:
                         // do something here
-                        fragment = composeFragment;
+                        fragment = searchFragment;
                         break;
                     default:
                         fragment = feedFragment;
@@ -124,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
                     // Need access token to make calls to Spotify Web API
                     accessToken = response.getAccessToken();
                     getUserUri();
+                    ((SearchFragment) searchFragment).setToken(response.getAccessToken());
+                    ((ProfileFragment) profileFragment).setToken(response.getAccessToken());
                     break;
 
                 // Auth flow returned an error
@@ -163,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(responseData);
                     currentUserUri = json.getString("uri");
 
-
                 } catch (JSONException e) {
                     Log.i(TAG,e.toString());
                 }
@@ -198,7 +203,10 @@ public class MainActivity extends AppCompatActivity {
         return accessToken;
     }
 
-    public String getCurrentUserUri(){return currentUserUri;}
+    public String getCurrentUserUri(){
+        getUserUri();
+        return currentUserUri;
+    }
 
 
 }

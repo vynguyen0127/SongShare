@@ -97,12 +97,14 @@ public class SearchFragment extends Fragment {
         songs = new ArrayList<>();
         adapter = new SongAdapter(getContext(),songs);
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
         rvResults.setAdapter(adapter);
-        rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
+        rvResults.setLayoutManager(gridLayoutManager);
 
         progress = (ProgressBar) view.findViewById(R.id.progress);
 
     }
+
 
     @Override
     public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
@@ -115,7 +117,7 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Fetch the data remotely
-                makeRequest(query);
+                makeRequest(query,true);
                 // Reset SearchView
                 searchView.clearFocus();
                 searchView.setQuery("", false);
@@ -133,8 +135,12 @@ public class SearchFragment extends Fragment {
 
     }
 
+    public void setToken(String token){
+        accessToken = token;
+        Log.i(TAG, "token: " + accessToken);
+    }
 
-    private void makeRequest (String query) {
+    private void makeRequest (String query, Boolean search) {
 
         progress.setVisibility(ProgressBar.VISIBLE);
 
@@ -146,6 +152,9 @@ public class SearchFragment extends Fragment {
         }
 
         String url = getUrl(query);
+        if(!search){Log.i(TAG, "Getting new releases");}
+        else{Log.i(TAG,"searching for track");}
+
 
         final Request request = new Request.Builder()
                 .url(url)
@@ -177,9 +186,10 @@ public class SearchFragment extends Fragment {
 
                     String responseData = response.body().string();
                     JSONObject json = new JSONObject(responseData);
-                    JSONObject json2 = new JSONObject(json.getString("tracks"));
+                    JSONArray array;
 
-                    JSONArray array = new JSONArray(json2.getString("items"));
+                    JSONObject json2 = new JSONObject(json.getString("tracks"));
+                    array = new JSONArray(json2.getString("items"));
 
                     if(!songs.isEmpty()){
                         songs.clear();

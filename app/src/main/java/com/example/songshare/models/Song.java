@@ -16,7 +16,7 @@ public class Song {
     private String albumUrl;
     private String artistName;
     private String songTitle;
-    private String songId;
+    private String songUri;
 
     Song(){}
     
@@ -32,8 +32,8 @@ public class Song {
             artistName = json7.getString("name").toString();
 
             songTitle = jsonObject.getString("name").toString();
-            songId = jsonObject.getString("uri").toString();
-            Log.i("Song", "Album: " + albumUrl + ", Artist: " + artistName + ", Song: " + songTitle + ", URI: " + songId);
+            songUri = jsonObject.getString("uri").toString();
+            Log.i("Song", "Album: " + albumUrl + ", Artist: " + artistName + ", Song: " + songTitle + ", URI: " + songUri);
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -63,7 +63,7 @@ public class Song {
         return songTitle;
     }
 
-    public String getSongId() {
-        return songId;
+    public String getSongUri() {
+        return songUri;
     }
 }

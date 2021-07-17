@@ -180,7 +180,6 @@ public class FeedFragment extends Fragment {
                 rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
             }
 
-            // add song to Spotify Playlist
         }
     };
 

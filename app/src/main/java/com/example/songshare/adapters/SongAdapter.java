@@ -132,6 +132,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             tvArtist = itemView.findViewById(R.id.tvArtist);
 
             itemView.setOnClickListener(this);
+
         }
 
         public void bind(Song song) {
@@ -146,7 +147,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    remote.getPlayerApi().play(song.getSongId());
+                    remote.getPlayerApi().play(song.getSongUri());
                     remote.getPlayerApi().seekToRelativePosition(35000);
 
                     Log.i(TAG, "Play clicked!");
@@ -182,5 +183,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 context.startActivity(i);
             }
         }
+
     }
 }
