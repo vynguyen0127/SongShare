@@ -72,10 +72,10 @@ public class PlaylistAddActivity extends AppCompatActivity {
         rvPlaylists = findViewById(R.id.rvPlaylists);
         tvHint = findViewById(R.id.tvHint);
         
-        tvSongTitle.setText(post.getSongTitle());
-        tvArtist.setText(post.getArtist());
+        tvSongTitle.setText(song.getSongTitle());
+        tvArtist.setText(song.getArtistName());
         Glide.with(PlaylistAddActivity.this)
-                .load(post.getAlbumURL())
+                .load(song.getAlbumUrl())
                 .into(ivAlbum);
         
         playlists = new ArrayList<>();
