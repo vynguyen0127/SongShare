@@ -10,6 +10,7 @@
     android:layout_marginEnd="10dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
+    android:id="@+id/cvSong"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="10dp">
@@ -17,6 +18,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/linLaySong"
         android:orientation="vertical">
 
         <FrameLayout
@@ -65,8 +67,9 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
+                android:fontFamily="@font/baloo"
                 android:textAlignment="center"
-                android:textSize="16sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 tools:text="Title" />
 
@@ -78,6 +81,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="20dp"
+                android:fontFamily="@font/baloo"
+                android:textSize="20sp"
                 tools:text="Artist" />
         </LinearLayout>
 

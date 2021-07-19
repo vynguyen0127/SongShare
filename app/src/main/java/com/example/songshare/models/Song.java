@@ -17,14 +17,16 @@ public class Song {
     private String artistName;
     private String songTitle;
     private String songUri;
+    private String songId;
 
     Song(){}
 
-    public Song(String albumUrl, String artistName, String songTitle, String songUri){
+    public Song(String albumUrl, String artistName, String songTitle, String songUri,String songId){
         this.albumUrl = albumUrl;
         this.artistName = artistName;
         this.songTitle = songTitle;
         this.songUri = songUri;
+        this.songId = songId;
     }
     
     Song(JSONObject jsonObject){
@@ -38,6 +40,7 @@ public class Song {
             JSONObject json7 = new JSONObject(array3.get(0).toString());
             artistName = json7.getString("name").toString();
 
+            songId = jsonObject.get("id").toString();
             songTitle = jsonObject.getString("name").toString();
             songUri = jsonObject.getString("uri").toString();
             Log.i("Song", "Album: " + albumUrl + ", Artist: " + artistName + ", Song: " + songTitle + ", URI: " + songUri);
@@ -73,4 +76,6 @@ public class Song {
     public String getSongUri() {
         return songUri;
     }
+
+    public String getSongId() { return songId; }
 }

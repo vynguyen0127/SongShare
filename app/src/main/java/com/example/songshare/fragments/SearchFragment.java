@@ -49,7 +49,7 @@ public class SearchFragment extends Fragment {
     private SongAdapter adapter;
     private ProgressBar progress;
 
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    private final OkHttpClient okHttpClient = new OkHttpClient();
     private String accessToken;
 
     public SearchFragment() {
@@ -95,7 +95,8 @@ public class SearchFragment extends Fragment {
         rvResults = view.findViewById(R.id.rvResults);
 
         songs = new ArrayList<>();
-        adapter = new SongAdapter(getContext(),songs,true);
+        adapter = new SongAdapter(getContext(),songs, MainActivity.Mode.SEARCH);
+        adapter.setToken(accessToken);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
         rvResults.setAdapter(adapter);
@@ -174,7 +175,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void call(Request request){
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
+        okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.i(TAG,"onFailure");

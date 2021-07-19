@@ -18,7 +18,7 @@ public class OverlapDecoration extends RecyclerView.ItemDecoration {
         if (itemPosition == 0) {
             outRect.set(0, 0, 0, 0);
         } else {
-            outRect.set(0, overlap, 0, 0);
+            outRect.set(0, 0, 0, overlap);
         }
     }
 

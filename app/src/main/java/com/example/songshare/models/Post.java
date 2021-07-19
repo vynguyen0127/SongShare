@@ -28,7 +28,7 @@ public class Post extends ParseObject {
         return getParseUser(KEY_USER);
     }
 
-    public String getSongId(){
+    public String getSongUri(){
         return getString(KEY_SONGID);
     }
 

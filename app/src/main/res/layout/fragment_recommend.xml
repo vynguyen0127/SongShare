@@ -35,7 +35,7 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnRecommend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/recommend_btn" />

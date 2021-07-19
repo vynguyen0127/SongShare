@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.models.Post;
 import com.example.songshare.models.Song;
 import com.parse.ParseException;
@@ -48,6 +49,7 @@ public class PostDraftActivity extends AppCompatActivity {
 
         Glide.with(PostDraftActivity.this)
                 .load(song.getAlbumUrl())
+                .transform(new RoundedCorners(20))
                 .into(ivAlbum);
         tvSongTitle.setText(song.getSongTitle());
         tvArtist.setText(song.getArtistName());

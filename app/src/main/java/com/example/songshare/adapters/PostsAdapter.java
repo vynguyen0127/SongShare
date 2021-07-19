@@ -158,7 +158,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         Toast.makeText(context, "Unable to connect to Spotify App",Toast.LENGTH_LONG).show();
                         return;
                     }
-                    remote.getPlayerApi().play(post.getSongId());
+                    remote.getPlayerApi().play(post.getSongUri());
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();

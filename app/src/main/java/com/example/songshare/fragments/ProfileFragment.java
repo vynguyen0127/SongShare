@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.songshare.MainActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.SongAdapter;
 import com.example.songshare.models.Song;
@@ -79,13 +80,14 @@ public class ProfileFragment extends Fragment {
         tvUsername = view.findViewById(R.id.tvUsername);
 
         topSongs = new ArrayList<>();
-        adapter = new SongAdapter(getContext(),topSongs,true);
-
+        adapter = new SongAdapter(getContext(),topSongs,MainActivity.Mode.PROFILE);
+        adapter.setToken(accessToken);
         rvTopSongs.setAdapter(adapter);
         rvTopSongs.setLayoutManager(new GridLayoutManager(getContext(),2));
 
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
         tvTitle2.setText("My top songs:");
+
         makeRequest();
     }
 

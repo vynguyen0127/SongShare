@@ -17,11 +17,13 @@ import com.bumptech.glide.Glide;
 import com.example.songshare.adapters.PlaylistAdapter;
 import com.example.songshare.models.Playlist;
 import com.example.songshare.models.Post;
+import com.example.songshare.models.Song;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import okhttp3.Response;
 public class PlaylistAddActivity extends AppCompatActivity {
 
     private Post post;
+    private Song song;
     private TextView tvSongTitle;
     private TextView tvArtist;
     private ImageView ivAlbum;
@@ -58,7 +61,8 @@ public class PlaylistAddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
 
-        post = getIntent().getParcelableExtra("Post");
+        song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
+
         accessToken = getIntent().getStringExtra("Token");
         currentUserUri = getIntent().getStringExtra("Uri");
 
@@ -184,7 +188,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
         @Override
         public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
             Playlist item = playlists.get(viewHolder.getAdapterPosition());
-            addSong(item.getPlaylistId(), post.getSongId());
+            addSong(item.getPlaylistId(), post.getSongUri());
             finish();
         }
     };

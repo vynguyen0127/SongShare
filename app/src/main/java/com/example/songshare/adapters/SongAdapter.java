@@ -8,14 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.example.songshare.MainActivity;
 import com.example.songshare.PostDraftActivity;
 import com.example.songshare.R;
 import com.example.songshare.models.Song;
@@ -37,19 +40,30 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private List<Song> songs;
     private Context context;
     private SpotifyAppRemote remote;
-    Boolean temp;
+    MainActivity.Mode mode;
+    String token;
+    String uri;
 
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
 
     public static final String TAG = "SongAdapter";
 
-    public SongAdapter(Context context, List<Song> songs,Boolean temp){
+    public SongAdapter(Context context, List<Song> songs, MainActivity.Mode mode){
         this.context = context;
         this.songs = songs;
-        this.temp = temp;
+        this.mode = mode;
 
         connectRemote();
+    }
+
+    public void setToken(String token){
+        this.token = token;
+
+    }
+
+    public void setUri(String uri){
+        this.uri = uri;
     }
 
     public void connectRemote(){
@@ -105,8 +119,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        int layout;
+        switch(mode){
+            case SEED:
+                layout = R.layout.item_song;
+                break;
+            default:
+                layout = R.layout.item_song_alt;
+        }
+
         View view = LayoutInflater.from(context).
-                inflate((temp ? R.layout.item_song_alt : R.layout.item_song),parent,false);
+                inflate(layout,parent,false);
         return new ViewHolder(view);
     }
 
@@ -126,6 +149,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         ImageView ivAlbum;
         TextView tvSongTitle;
         TextView tvArtist;
+        CardView cvSong;
+        LinearLayout linLaySong;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -133,9 +158,26 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             ivAlbum = itemView.findViewById(R.id.ivCover);
             tvSongTitle = itemView.findViewById(R.id.tvTitle);
             tvArtist = itemView.findViewById(R.id.tvArtist);
+            cvSong = itemView.findViewById(R.id.cvSong);
+            linLaySong = itemView.findViewById(R.id.linLaySong);
 
-            itemView.setOnClickListener(this);
 
+
+
+            switch(mode){
+                case SEED:
+                    break;
+                case PROFILE:
+                    cvSong.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));
+                    linLaySong.setBackgroundColor(context.getResources().getColor(R.color.orchid_pink));
+                case SEARCH:
+                case RECOMMEND:
+                    itemView.setOnClickListener(this);
+                    break;
+                default:
+                    itemView.setOnClickListener(this);
+
+            }
         }
 
         public void bind(Song song) {
@@ -146,6 +188,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
             tvSongTitle.setText(song.getSongTitle());
             tvArtist.setText(song.getArtistName());
+
 
             ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override

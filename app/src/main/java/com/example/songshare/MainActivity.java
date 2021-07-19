@@ -46,6 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private String accessToken;
     private String currentUserUri;
 
+    public enum Mode {
+        SEED,
+        RECOMMEND,
+        SEARCH,
+        PROFILE
+    }
+
     Fragment feedFragment;
     Fragment profileFragment;
     Fragment searchFragment;
@@ -108,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization
         AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
@@ -136,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
                     getUserUri();
                     ((SearchFragment) searchFragment).setToken(response.getAccessToken());
                     ((ProfileFragment) profileFragment).setToken(response.getAccessToken());
+                    ((RecommendFragment) recommendFragment).setToken(response.getAccessToken());
+
                     break;
 
                 // Auth flow returned an error

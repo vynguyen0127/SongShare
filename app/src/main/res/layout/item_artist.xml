@@ -9,7 +9,6 @@
     android:layout_marginTop="15dp"
     android:layout_marginEnd="10dp"
     android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground"
     card_view:cardBackgroundColor="@color/black"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="10dp">
@@ -54,6 +53,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="7.5dp"
                 android:layout_marginBottom="15dp"
+                android:fontFamily="@font/baloo"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 tools:text="Artist Name" />

@@ -24,11 +24,13 @@ import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.PostsAdapter;
 import com.example.songshare.models.Post;
+import com.example.songshare.models.Song;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,12 +170,14 @@ public class FeedFragment extends Fragment {
                 Post post = allPosts.get(viewHolder.getAdapterPosition());
 
                 rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+                Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
 
                 Intent i = new Intent(getContext(), PlaylistAddActivity.class);
-                i.putExtra("Post",post);
+                i.putExtra("Song", Parcels.wrap(song));
                 i.putExtra("Token", accessToken);
                 i.putExtra("Uri",uri);
                 startActivity(i);
+
             }
             else {
                 Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
