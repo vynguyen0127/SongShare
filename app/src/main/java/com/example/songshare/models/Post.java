@@ -6,6 +6,8 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+
 import java.util.Date;
 
 @ParseClassName("Post")
@@ -17,6 +19,7 @@ public class Post extends ParseObject {
     public static final String KEY_ALBUM_URL = "album_url";
     public static final String KEY_ARTIST = "artist";
     public static final String KEY_SONG_TITLE = "song_title";
+    public static final String KEY_USERS_LIKED = "users_liked";
 
     public Post(){}
 
@@ -44,6 +47,8 @@ public class Post extends ParseObject {
         return getString(KEY_SONG_TITLE);
     }
 
+    public JSONArray getUsersLiked(){ return getJSONArray(KEY_USERS_LIKED); }
+
     public void setCaption(String caption){
         put(KEY_CAPTION, caption);
     }
@@ -61,6 +66,8 @@ public class Post extends ParseObject {
     public void setArtist(String artist){ put(KEY_ARTIST, artist); }
 
     public void setSongTitle(String songTitle){ put(KEY_SONG_TITLE,songTitle ); }
+
+    public void setKeyUsersLiked(JSONArray usersLiked){put(KEY_USERS_LIKED, usersLiked);}
 
     public static String calculateTimeAgo(Date createdAt) {
 

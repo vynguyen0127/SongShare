@@ -18,6 +18,7 @@ import com.example.songshare.adapters.PlaylistAdapter;
 import com.example.songshare.models.Playlist;
 import com.example.songshare.models.Post;
 import com.example.songshare.models.Song;
+import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -59,7 +60,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_detail);
+        setContentView(R.layout.activity_playlist_add);
 
         song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
 
@@ -100,7 +101,9 @@ public class PlaylistAddActivity extends AppCompatActivity {
     }
 
     private String getUrl(){
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/me/playlists").newBuilder();
+//        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/me/playlists").newBuilder();
+        String temp = (String) ParseUser.getCurrentUser().get("spotify_id");
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/users/%s/playlists",temp)).newBuilder();
         urlBuilder.addQueryParameter("limit","50");
         String url = urlBuilder.build().toString();
         return url;
@@ -120,6 +123,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(responseData);
                     JSONArray array  = new JSONArray(json.get("items").toString());
 
+                    Log.i(TAG,array.toString());
                     for(int i = 0; i < array.length(); i++){
                         JSONObject object = new JSONObject(array.get(i).toString());
                         JSONObject owner = object.getJSONObject("owner");

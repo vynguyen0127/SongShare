@@ -92,7 +92,7 @@ public class RecommendFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         songs = new ArrayList<>();
-        songAdapter = new SongAdapter(getContext(), songs, MainActivity.Mode.SEED);
+        songAdapter = new SongAdapter(getContext(), songs, MainActivity.songMode.SEED);
 
         songAdapter.setToken(accessToken);
 
@@ -169,7 +169,7 @@ public class RecommendFragment extends Fragment {
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
+        popupWindow.setAnimationStyle(R.style.popup_window_animation_phone);
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);

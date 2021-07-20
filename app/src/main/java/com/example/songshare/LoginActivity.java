@@ -47,14 +47,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-//        btnSignUp.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-//                startActivity(i);
-//                finish();
-//            }
-//        });
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
     }
     private void loginUser(String username, String password) {
         Log.i(TAG,"Attempting to log in user: " + username);

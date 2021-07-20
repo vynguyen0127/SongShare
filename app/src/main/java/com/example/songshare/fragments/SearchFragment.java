@@ -95,7 +95,7 @@ public class SearchFragment extends Fragment {
         rvResults = view.findViewById(R.id.rvResults);
 
         songs = new ArrayList<>();
-        adapter = new SongAdapter(getContext(),songs, MainActivity.Mode.SEARCH);
+        adapter = new SongAdapter(getContext(),songs, MainActivity.songMode.SEARCH);
         adapter.setToken(accessToken);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);

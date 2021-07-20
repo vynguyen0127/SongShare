@@ -46,11 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private String accessToken;
     private String currentUserUri;
 
-    public enum Mode {
+    public enum songMode {
         SEED,
         RECOMMEND,
         SEARCH,
         PROFILE
+    }
+
+    public enum postMode{
+        PROFILE,
+        FEED
     }
 
     Fragment feedFragment;
@@ -112,13 +117,12 @@ public class MainActivity extends AppCompatActivity {
         view.setBackgroundColor(getResources().getColor(R.color.cream));
 
         authorizeAccount();
-
     }
 
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization
         AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
-        builder.setScopes(SCOPES); // need to add additional scopes to modify user's playlists
+        builder.setScopes(SCOPES);
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
     }
@@ -182,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     JSONObject json = new JSONObject(responseData);
                     currentUserUri = json.getString("uri");
+                    String temp = (String) ParseUser.getCurrentUser().get("spotify_uri");
+                    Log.i(TAG, "Spotify: " + currentUserUri + ", App: " + temp);
 
                 } catch (JSONException e) {
                     Log.i(TAG,e.toString());

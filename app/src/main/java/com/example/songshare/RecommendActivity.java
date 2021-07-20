@@ -66,7 +66,7 @@ public class RecommendActivity extends AppCompatActivity {
         rvResults = findViewById(R.id.rvResults);
 
         results = new ArrayList<>();
-        adapter = new SongAdapter(RecommendActivity.this,results, MainActivity.Mode.RECOMMEND);
+        adapter = new SongAdapter(RecommendActivity.this,results, MainActivity.songMode.RECOMMEND);
         adapter.setToken(accessToken);
         adapter.setUri(uri);
 

@@ -40,7 +40,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private List<Song> songs;
     private Context context;
     private SpotifyAppRemote remote;
-    MainActivity.Mode mode;
+    MainActivity.songMode songMode;
     String token;
     String uri;
 
@@ -49,10 +49,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     public static final String TAG = "SongAdapter";
 
-    public SongAdapter(Context context, List<Song> songs, MainActivity.Mode mode){
+    public SongAdapter(Context context, List<Song> songs, MainActivity.songMode songMode){
         this.context = context;
         this.songs = songs;
-        this.mode = mode;
+        this.songMode = songMode;
 
         connectRemote();
     }
@@ -120,7 +120,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         int layout;
-        switch(mode){
+        switch(songMode){
             case SEED:
                 layout = R.layout.item_song;
                 break;
@@ -164,13 +164,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
 
 
-            switch(mode){
+            switch(songMode){
                 case SEED:
                     break;
-                case PROFILE:
+                case SEARCH:
                     cvSong.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));
                     linLaySong.setBackgroundColor(context.getResources().getColor(R.color.orchid_pink));
-                case SEARCH:
                 case RECOMMEND:
                     itemView.setOnClickListener(this);
                     break;
