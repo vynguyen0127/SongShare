@@ -178,6 +178,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 tvUsername.setText("@" + post.getUser().getUsername());
                 tvCaption.setText(post.getCaption());
                 tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));
+                ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart));
                 checkUserLiked(post);
 
                 ibLike.setOnClickListener(new View.OnClickListener() {
@@ -200,6 +201,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                     Log.i(TAG, "object retrieved");
                                     object.add("liked_posts", temp);
                                     try {
+                                        Log.i(TAG,"set liked "+ post.getSongTitle());
                                         ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
                                         object.save();
                                     } catch (ParseException parseException) {
@@ -266,20 +268,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         private void checkUserLiked(Post post){
+            Log.i(TAG,"Checking song liked.... " + post.getSongTitle());
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
             String objectId = post.getObjectId();
             String userId = ParseUser.getCurrentUser().getObjectId();
             query.getInBackground(objectId,(object, e)->{
                 if(e == null){
                     final JSONArray array = object.getJSONArray("users_liked");
-                    Log.i(TAG, "users: " + array.toString());
-                    Log.i(TAG,"current: " + userId);
                     for(int i = 0; i < array.length(); i++){
                         try {
                             JSONObject j = new JSONObject(array.get(i).toString());
                             Log.i(TAG,"object: " + j.getString("objectId"));
                             if(Objects.equals(j.getString("objectId"), userId)){
-                                Log.i(TAG,"user liked this post!");
+                                Log.i(TAG,"user liked this post! Song: " + post.getSongTitle());
                                 ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
                                 liked = true;
                             }
