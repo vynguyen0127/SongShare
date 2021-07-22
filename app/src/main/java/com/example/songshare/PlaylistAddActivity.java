@@ -62,7 +62,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
 
         song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
         accessToken = getIntent().getStringExtra("Token");
-        currentUserUri = getIntent().getStringExtra("Uri");
+        currentUserUri = (String) ParseUser.getCurrentUser().get("spotify_uri");
 
         tvSongTitle = findViewById(R.id.tvTitle);
         tvArtist = findViewById(R.id.tvArtist);

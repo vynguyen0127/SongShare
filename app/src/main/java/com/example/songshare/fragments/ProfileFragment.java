@@ -78,13 +78,12 @@ public class ProfileFragment extends Fragment {
 
         adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.FEED);
         rvTopSongs.setAdapter(adapter);
-//        rvTopSongs.setLayoutManager(new GridLayoutManager(getContext(),2));
+
         rvTopSongs.setLayoutManager(new LinearLayoutManager(getContext()));
 
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
         tvTitle2.setText("Posts:");
 
-//        makeRequest();
         queryPosts();
     }
 

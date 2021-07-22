@@ -3,7 +3,9 @@ package com.example.songshare.adapters;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -164,6 +166,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 ibLike = itemView.findViewById(R.id.ibLike);
             }
             itemView.setOnClickListener(this);
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                private GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        Log.d(TAG, "onDoubleTap");
+                        int position = getAdapterPosition();
+                        if(position != RecyclerView.NO_POSITION){
+                            Post p = posts.get(position);
+                            likePost(p);
+                        }
+                        return super.onDoubleTap(e);
+                    }
+
+                });
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Log.d(TAG, "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
+                    gestureDetector.onTouchEvent(event);
+                    return true;
+                }
+            });
         }
 
         public void bind(Post post) {
@@ -186,49 +210,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     @Override
                     public void onClick(View v) {
                         if(!liked){
-
-                            // add post to user's liked_posts array
-                            int position = getAdapterPosition();
-                            Post temp = posts.get(position);
-
-                            ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-                            String objectId = ParseUser.getCurrentUser().getObjectId();
-                            // The query will search for a ParseObject, given its objectId.
-                            // When the query finishes running, it will invoke the GetCallback
-                            // with either the object, or the exception thrown
-                            query.getInBackground(objectId, (object, e) -> {
-                                if (e == null) {
-                                    //Object was successfully retrieved
-                                    Log.i(TAG, "object retrieved");
-                                    object.add("liked_posts", temp);
-                                    try {
-                                        Log.i(TAG,"set liked "+ post.getSongTitle());
-                                        ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
-                                        object.save();
-                                    } catch (ParseException parseException) {
-                                        parseException.printStackTrace();
-                                    }
-                                } else {
-                                    // something went wrong
-                                    Log.i(TAG, e.getMessage());
-                                }
-                            });
-
-                            query = ParseQuery.getQuery("Post");
-                            objectId = post.getObjectId();
-
-                            query.getInBackground(objectId, (object, e) -> {
-                                if (e == null) {
-                                    object.add("users_liked", ParseUser.getCurrentUser());
-                                    try {
-                                        object.save();
-                                    } catch (ParseException parseException) {
-                                        parseException.printStackTrace();
-                                    }
-                                } else {
-                                    Log.i(TAG, e.getMessage());
-                                }
-                            });
+                            likePost(post);
                         }
                     }
                 });
@@ -262,6 +244,54 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             });
 
 
+        }
+
+        private void likePost(Post post) {
+            {
+                // add post to user's liked_posts array
+                int position = getAdapterPosition();
+                Post temp = posts.get(position);
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+                String objectId = ParseUser.getCurrentUser().getObjectId();
+                // The query will search for a ParseObject, given its objectId.
+                // When the query finishes running, it will invoke the GetCallback
+                // with either the object, or the exception thrown
+                query.getInBackground(objectId, (object, e) -> {
+                    if (e == null) {
+                        //Object was successfully retrieved
+                        Log.i(TAG, "object retrieved");
+                        object.add("liked_posts", temp);
+                        try {
+                            Log.i(TAG,"set liked "+ post.getSongTitle());
+                            Toast.makeText(context,"Liked post!",Toast.LENGTH_SHORT).show();
+                            ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
+                            object.save();
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
+                    } else {
+                        // something went wrong
+                        Log.i(TAG, e.getMessage());
+                    }
+                });
+
+                query = ParseQuery.getQuery("Post");
+                objectId = post.getObjectId();
+
+                query.getInBackground(objectId, (object, e) -> {
+                    if (e == null) {
+                        object.add("users_liked", ParseUser.getCurrentUser());
+                        try {
+                            object.save();
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
+                    } else {
+                        Log.i(TAG, e.getMessage());
+                    }
+                });
+            }
         }
 
         @Override

@@ -179,7 +179,6 @@ public class FeedFragment extends Fragment {
                 Intent i = new Intent(getContext(), PlaylistAddActivity.class);
                 i.putExtra("Song", Parcels.wrap(song));
                 i.putExtra("Token", accessToken);
-                i.putExtra("Uri",uri);
                 startActivity(i);
 
             }

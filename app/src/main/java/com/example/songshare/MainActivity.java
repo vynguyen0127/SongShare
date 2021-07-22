@@ -93,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
         profileFragment = new ProfileFragment();
         searchFragment = new SearchFragment();
         recommendFragment = new RecommendFragment();
-
+        mView = this.getWindow().getDecorView();
+        mView.setBackgroundColor(getResources().getColor(R.color.cream));
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -123,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
-        mView = this.getWindow().getDecorView();
-        mView.setBackgroundColor(getResources().getColor(R.color.cream));
 
         authorizeAccount();
     }

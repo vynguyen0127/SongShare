@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.MainActivity;
+import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.PostDraftActivity;
 import com.example.songshare.R;
 import com.example.songshare.models.Song;
@@ -144,7 +145,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return songs.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
 
         ImageView ivAlbum;
         TextView tvSongTitle;
@@ -162,21 +163,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             linLaySong = itemView.findViewById(R.id.linLaySong);
 
 
-
-
             switch(songMode){
                 case SEED:
                     break;
+                case RECOMMEND:
                 case SEARCH:
                     cvSong.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));
                     linLaySong.setBackgroundColor(context.getResources().getColor(R.color.orchid_pink));
-                case RECOMMEND:
+                    itemView.setOnLongClickListener(this);
                     itemView.setOnClickListener(this);
                     break;
                 default:
                     itemView.setOnClickListener(this);
 
             }
+
         }
 
         public void bind(Song song) {
@@ -229,5 +230,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
         }
 
+        @Override
+        public boolean onLongClick(View v) {
+            int position = getAdapterPosition();
+            if(position != RecyclerView.NO_POSITION){
+                Intent i = new Intent(context, PlaylistAddActivity.class);
+                i.putExtra("Song",Parcels.wrap(songs.get(position)));
+                i.putExtra("Token",token);
+                context.startActivity(i);
+
+            }
+            return false;
+        }
     }
 }

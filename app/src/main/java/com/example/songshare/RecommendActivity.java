@@ -1,9 +1,12 @@
 package com.example.songshare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -155,5 +158,24 @@ public class RecommendActivity extends AppCompatActivity {
                 rvResults.smoothScrollToPosition(0);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_post_detail,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.exit){
+            Intent i = new Intent(RecommendActivity.this,MainActivity.class);
+            startActivity(i);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
