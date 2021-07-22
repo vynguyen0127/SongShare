@@ -67,7 +67,7 @@ public class Post extends ParseObject {
 
     public void setSongTitle(String songTitle){ put(KEY_SONG_TITLE,songTitle ); }
 
-    public void setKeyUsersLiked(JSONArray usersLiked){put(KEY_USERS_LIKED, usersLiked);}
+    public void setUsersLiked(JSONArray usersLiked){put(KEY_USERS_LIKED, usersLiked);}
 
     public static String calculateTimeAgo(Date createdAt) {
 

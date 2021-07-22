@@ -7,9 +7,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -63,7 +61,6 @@ public class PlaylistAddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playlist_add);
 
         song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
-
         accessToken = getIntent().getStringExtra("Token");
         currentUserUri = getIntent().getStringExtra("Uri");
 
@@ -84,7 +81,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
         
         rvPlaylists.setAdapter(adapter);
         rvPlaylists.setLayoutManager(new LinearLayoutManager(PlaylistAddActivity.this));
-        new ItemTouchHelper(simpleCallback).attachToRecyclerView(rvPlaylists);
+
         makeRequest();
     }
 
@@ -159,7 +156,9 @@ public class PlaylistAddActivity extends AppCompatActivity {
         });
     }
 
-    private void addSong(String playlistId, String songUri){
+    public void addSong(String playlistId){
+
+        String songUri = song.getSongUri();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/playlists/%s/tracks",playlistId)).newBuilder();
         urlBuilder.addQueryParameter("uris",songUri);
@@ -182,18 +181,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
             }
         });
 
+        finish();
     }
-    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
-        @Override
-        public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-            return false;
-        }
 
-        @Override
-        public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-            Playlist item = playlists.get(viewHolder.getAdapterPosition());
-            addSong(item.getPlaylistId(), post.getSongUri());
-            finish();
-        }
-    };
 }

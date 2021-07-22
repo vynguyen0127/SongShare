@@ -2,10 +2,18 @@ package com.example.songshare;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1337;
     private String accessToken;
     private String currentUserUri;
+    View mView;
 
     public enum songMode {
         SEED,
@@ -113,8 +123,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
-        View view = this.getWindow().getDecorView();
-        view.setBackgroundColor(getResources().getColor(R.color.cream));
+        mView = this.getWindow().getDecorView();
+        mView.setBackgroundColor(getResources().getColor(R.color.cream));
 
         authorizeAccount();
     }
@@ -144,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     // Need access token to make calls to Spotify Web API
                     accessToken = response.getAccessToken();
                     getUserUri();
+
                     ((SearchFragment) searchFragment).setToken(response.getAccessToken());
                     ((ProfileFragment) profileFragment).setToken(response.getAccessToken());
                     ((RecommendFragment) recommendFragment).setToken(response.getAccessToken());
@@ -186,8 +197,26 @@ public class MainActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     JSONObject json = new JSONObject(responseData);
                     currentUserUri = json.getString("uri");
+
                     String temp = (String) ParseUser.getCurrentUser().get("spotify_uri");
+                    String product = json.getString("product");
                     Log.i(TAG, "Spotify: " + currentUserUri + ", App: " + temp);
+                    if(!Objects.equals(currentUserUri,ParseUser.getCurrentUser().get("spotify_uri"))){
+                        Log.i(TAG,"URIs do not match!");
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this,"ERROR: current Spotify user does not match this user. Please try again.",Toast.LENGTH_LONG).show();
+                        logOutUser();
+                    }
+                    if(!Objects.equals(product,"premium")){
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Update UI
+                                showPopUpWindow(mView);
+                            }
+                        });
+                    }
 
                 } catch (JSONException e) {
                     Log.i(TAG,e.toString());
@@ -210,11 +239,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId() == R.id.logOut){
-            ParseUser.logOut();
-            ParseUser currentUser = ParseUser.getCurrentUser();
-            Intent i = new Intent(MainActivity.this,LoginActivity.class);
-            startActivity(i);
-            finish();
+            logOutUser();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -228,5 +253,37 @@ public class MainActivity extends AppCompatActivity {
         return currentUserUri;
     }
 
+    public void logOutUser(){
+        ParseUser.logOut();
+        Intent i = new Intent(MainActivity.this,LoginActivity.class);
+        startActivity(i);
+        finish();
+    }
 
+    private void showPopUpWindow(View view) {
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                MainActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_warning, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow.setAnimationStyle(R.style.popup_window_animation_alt);
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
 }

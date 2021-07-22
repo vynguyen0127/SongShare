@@ -14,7 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.MainActivity;
@@ -76,12 +76,13 @@ public class ProfileFragment extends Fragment {
         progress = (ProgressBar) view.findViewById(R.id.progress);
         myPosts = new ArrayList<>();
 
-        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.PROFILE);
+        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.FEED);
         rvTopSongs.setAdapter(adapter);
-        rvTopSongs.setLayoutManager(new GridLayoutManager(getContext(),2));
+//        rvTopSongs.setLayoutManager(new GridLayoutManager(getContext(),2));
+        rvTopSongs.setLayoutManager(new LinearLayoutManager(getContext()));
 
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
-        tvTitle2.setText("My top songs:");
+        tvTitle2.setText("Posts:");
 
 //        makeRequest();
         queryPosts();

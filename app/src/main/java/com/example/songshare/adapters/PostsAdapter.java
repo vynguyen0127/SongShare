@@ -50,6 +50,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private MainActivity.postMode mode;
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
+
     public PostsAdapter(Context context, List<Post> posts, MainActivity.postMode mode){
         this.context = context;
         this.posts = posts;
@@ -179,7 +180,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 tvCaption.setText(post.getCaption());
                 tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));
                 ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart));
-                checkUserLiked(post);
+                liked = checkUserLiked(post);
 
                 ibLike.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -243,7 +244,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     remote.getPlayerApi().play(post.getSongUri());
 
                     Log.i(TAG, "Play clicked!");
-                    Toast.makeText(context,"Now playing: " + post.getSongTitle(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"Now playing: " + post.getSongTitle() + " by " + post.getArtist(), Toast.LENGTH_LONG).show();
 
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -251,6 +252,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         @Override
                         public void run() {
                             // change image
+
                             remote.getPlayerApi().pause();
                         }
 
@@ -267,33 +269,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         }
 
-        private void checkUserLiked(Post post){
+        private boolean checkUserLiked(Post post){
             Log.i(TAG,"Checking song liked.... " + post.getSongTitle());
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
-            String objectId = post.getObjectId();
-            String userId = ParseUser.getCurrentUser().getObjectId();
-            query.getInBackground(objectId,(object, e)->{
-                if(e == null){
-                    final JSONArray array = object.getJSONArray("users_liked");
-                    for(int i = 0; i < array.length(); i++){
-                        try {
-                            JSONObject j = new JSONObject(array.get(i).toString());
-                            Log.i(TAG,"object: " + j.getString("objectId"));
-                            if(Objects.equals(j.getString("objectId"), userId)){
-                                Log.i(TAG,"user liked this post! Song: " + post.getSongTitle());
-                                ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
-                                liked = true;
-                            }
-                        } catch (JSONException jsonException) {
-                            jsonException.printStackTrace();
-                        }
-                    }
 
-                }else{
-                    Log.i(TAG,e.getMessage());
+            String userId = ParseUser.getCurrentUser().getObjectId();
+
+            JSONArray a = post.getUsersLiked();
+            for(int i = 0; i < a.length();i++){
+                JSONObject j = null;
+                try {
+                    j = new JSONObject(a.get(i).toString());
+                    if(Objects.equals(j.getString("objectId"), userId)){
+                        Log.i(TAG,"user liked this post! Song: " + post.getSongTitle());
+                        ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
+                        return true;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            });
-            liked = false;
+
+            }
+            return false;
         }
     }
 }

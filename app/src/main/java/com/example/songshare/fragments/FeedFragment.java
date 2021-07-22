@@ -93,9 +93,7 @@ public class FeedFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
+
                 allPosts.clear();
                 queryPosts();
                 swipeContainer.setRefreshing(false);
@@ -148,6 +146,12 @@ public class FeedFragment extends Fragment {
     }
 
     private String fetchUserUri(){ return ((MainActivity)this.getActivity()).getCurrentUserUri(); }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        adapter.disconnectRemote();
+    }
 
     @Override
     public void onDestroy() {

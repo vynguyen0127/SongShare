@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
 import com.example.songshare.models.Playlist;
 
@@ -53,7 +54,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView tvPlaylistName;
         ImageView ivCover;
@@ -62,6 +63,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
             tvPlaylistName = itemView.findViewById(R.id.tvTitle);
             ivCover = itemView.findViewById(R.id.ivCover);
+
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Playlist playlist){
@@ -78,6 +81,13 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
                         .transform(new RoundedCorners(20))
                         .into(ivCover);
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            Playlist item = playlists.get(getAdapterPosition());
+            ((PlaylistAddActivity)context).addSong(item.getPlaylistId());
+
         }
     }
 

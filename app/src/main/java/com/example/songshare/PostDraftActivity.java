@@ -22,6 +22,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.json.JSONArray;
 import org.parceler.Parcels;
 
 public class PostDraftActivity extends AppCompatActivity {
@@ -74,6 +75,7 @@ public class PostDraftActivity extends AppCompatActivity {
         post.setArtist(song.getArtistName());
         post.setAlbumUrl(song.getAlbumUrl());
         post.setSongId(song.getSongUri());
+        post.setUsersLiked(new JSONArray());
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
