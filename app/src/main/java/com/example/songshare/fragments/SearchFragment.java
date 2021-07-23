@@ -55,6 +55,7 @@ public class SearchFragment extends Fragment {
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private String accessToken;
+    static String lastQuery;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -79,23 +80,29 @@ public class SearchFragment extends Fragment {
     public void onResume() {
         super.onResume();
         adapter.connectRemote();
+        Log.i(TAG,"onResume");
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.i(TAG,"onStop");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i(TAG,"onDestroy");
         adapter.disconnectRemote();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view,savedInstanceState);
-
+        if(lastQuery != null){
+            Log.i(TAG,"doing previous search");
+            makeRequest(lastQuery,true);
+        }
         rvResults = view.findViewById(R.id.rvResults);
 
         songs = new ArrayList<>();
@@ -122,19 +129,36 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Fetch the data remotely
-                makeRequest(query,true);
+//                makeRequest(query,true);
+                lastQuery = query;
                 // Reset SearchView
                 searchView.clearFocus();
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 searchItem.collapseActionView();
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Update UI
+                        progress.setVisibility(ProgressBar.GONE);
+                    }
+                });
 
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                return false;
+                if(s != null) {
+                    Log.i(TAG, "text change, new request");
+                    makeRequest(s, true);
+                    lastQuery = s;
+                }else{
+                    songs.clear();
+                    notifyAdapter();
+                }
+                return true;
             }
         });
 
@@ -157,8 +181,6 @@ public class SearchFragment extends Fragment {
         }
 
         String url = getUrl(query);
-        if(!search){Log.i(TAG, "Getting new releases");}
-        else{Log.i(TAG,"searching for track");}
 
 
         final Request request = new Request.Builder()
@@ -233,45 +255,25 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    public void goToPostDraftFragment(Song song){
-        Fragment postDraftFragment = new PostDraftFragment();
-        String backStateName = postDraftFragment.getClass().getName();
+    public void goToFragment(Song song, Fragment fragment){
+        Fragment destFragment = fragment;
+        String backStateName = destFragment.getClass().getName();
 
         boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
 
         if (!fragmentPopped){ //fragment not in back stack, create it.
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, postDraftFragment);
+            ft.replace(R.id.flContainer, destFragment);
             ft.addToBackStack(backStateName);
             ft.commit();
         }
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("song", Parcels.wrap(song));
-        postDraftFragment.setArguments(bundle);
+        destFragment.setArguments(bundle);
 
-        fragmentManager.beginTransaction().replace(R.id.flContainer,postDraftFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
-    public void goToPlaylistFragment(Song song){
-        Fragment playlistFragment = new PlaylistAddFragment();
-        String backStateName = playlistFragment.getClass().getName();
-
-        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
-
-        if (!fragmentPopped){ //fragment not in back stack, create it.
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, playlistFragment);
-            ft.addToBackStack(backStateName);
-            ft.commit();
-        }
-
-        Bundle bundle = new Bundle();
-        bundle.putString("token",accessToken);
-        bundle.putParcelable("song", Parcels.wrap(song));
-        playlistFragment.setArguments(bundle);
-
-        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
-    }
 
 }

@@ -134,15 +134,18 @@ public class SplashActivity extends AppCompatActivity {
                         finish();
                     }else{
                         ParseUser.logOut();
-                        Log.i(TAG,"go to log in page");
+                        Log.i(TAG,"go to log in page1");
                         Intent i = new Intent(SplashActivity.this,LoginActivity.class);
+                        i.putExtra("uri",uri);
                         startActivity(i);
                         finish();
                     }
 
                 }else{
-                    Log.i(TAG,"go to log in page");
+                    Log.i(TAG,"go to log in page2");
+                    Log.i(TAG,"sending uri: " + uri);
                     Intent i = new Intent(SplashActivity.this,LoginActivity.class);
+                    i.putExtra("uri",uri);
                     startActivity(i);
                     finish();
 

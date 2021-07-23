@@ -49,7 +49,6 @@ public class PlaylistAddFragment extends Fragment {
     private TextView tvSongTitle;
     private TextView tvArtist;
     private ImageView ivAlbum;
-    private TextView tvHint;
     private RecyclerView rvPlaylists;
     private List<Playlist> playlists;
     private PlaylistAdapter adapter;
@@ -91,7 +90,6 @@ public class PlaylistAddFragment extends Fragment {
         tvArtist = view.findViewById(R.id.tvArtist);
         ivAlbum = view.findViewById(R.id.ivCover);
         rvPlaylists = view.findViewById(R.id.rvPlaylists);
-        tvHint = view.findViewById(R.id.tvHint);
 
         tvSongTitle.setText(song.getSongTitle());
         tvArtist.setText(song.getArtistName());
@@ -121,7 +119,6 @@ public class PlaylistAddFragment extends Fragment {
     }
 
     private String getUrl(){
-//        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spotify.com/v1/me/playlists").newBuilder();
         String temp = (String) ParseUser.getCurrentUser().get("spotify_id");
         HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/users/%s/playlists",temp)).newBuilder();
         urlBuilder.addQueryParameter("limit","50");
@@ -190,7 +187,10 @@ public class PlaylistAddFragment extends Fragment {
         Log.i(TAG,"song: " + songUri + ", url: " +  url);
 
         final RequestBody body = RequestBody.create("", null);
-        final Request.Builder formBody = new Request.Builder().url(url).method("POST",body).header("Authorization", "Bearer " + accessToken);
+        final Request.Builder formBody = new Request.Builder()
+                .url(url)
+                .method("POST",body)
+                .header("Authorization", "Bearer " + accessToken);
         okHttpClient.newCall(formBody.build()).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {

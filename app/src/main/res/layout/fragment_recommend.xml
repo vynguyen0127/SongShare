@@ -7,11 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".fragments.RecommendFragment">
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SONGS" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSongs"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginBottom="5dp"
         android:clipToPadding="true"
         android:isScrollContainer="false"
         android:nestedScrollingEnabled="false">
@@ -23,6 +28,12 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ARTISTS" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvArtists"

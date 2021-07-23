@@ -2,10 +2,10 @@ package com.example.songshare.adapters;
 
 import android.content.Context;
 import android.os.Handler;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -139,7 +139,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         SpotifyAppRemote.disconnect(remote);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView tvSongTitle;
         TextView tvUsername;
@@ -151,6 +151,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         CardView cvPost;
         LinearLayout linLayPost;
         Boolean liked = false;
+        Boolean visible = false;
+        LinearLayout layoutCap;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -159,35 +162,31 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivAlbum = itemView.findViewById(R.id.ivCover);
             cvPost = itemView.findViewById(R.id.cvPost);
             linLayPost = itemView.findViewById(R.id.linLayPost);
+            layoutCap = itemView.findViewById(R.id.layoutCap);
+
             if(mode == MainActivity.postMode.FEED) {
                 tvUsername = itemView.findViewById(R.id.tvUsername);
                 tvCaption = itemView.findViewById(R.id.tvCaption);
                 tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
                 ibLike = itemView.findViewById(R.id.ibLike);
             }
-            itemView.setOnClickListener(this);
-            itemView.setOnTouchListener(new View.OnTouchListener() {
-                private GestureDetector gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onDoubleTap(MotionEvent e) {
-                        Log.d(TAG, "onDoubleTap");
-                        int position = getAdapterPosition();
-                        if(position != RecyclerView.NO_POSITION){
-                            Post p = posts.get(position);
-                            likePost(p);
-                        }
-                        return super.onDoubleTap(e);
-                    }
 
-                });
-
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    Log.d(TAG, "Raw event: " + event.getAction() + ", (" + event.getRawX() + ", " + event.getRawY() + ")");
-                    gestureDetector.onTouchEvent(event);
-                    return true;
+                public void onClick(View v) {
+                    if(visible){
+                        TransitionManager.beginDelayedTransition(cvPost,
+                                new AutoTransition());
+                        layoutCap.setVisibility(View.GONE);
+                    }else{
+                        TransitionManager.beginDelayedTransition(cvPost,
+                                new AutoTransition());
+                        layoutCap.setVisibility(View.VISIBLE);
+                    }
+                    visible = !visible;
                 }
             });
+
         }
 
         public void bind(Post post) {
@@ -294,10 +293,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         }
 
-        @Override
-        public void onClick(View v) {
-
-        }
 
         private boolean checkUserLiked(Post post){
             Log.i(TAG,"Checking song liked.... " + post.getSongTitle());
@@ -321,5 +316,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
             return false;
         }
+
     }
 }

@@ -182,44 +182,24 @@ public class ResultFragment extends Fragment {
         });
     }
 
-    public void goToPostDraftFragment(Song song){
-        Fragment postDraftFragment = new PostDraftFragment();
-        String backStateName = postDraftFragment.getClass().getName();
+    public void goToFragment(Song song, Fragment fragment){
+        Fragment destFragment = fragment;
+        String backStateName = destFragment.getClass().getName();
 
         boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
 
         if (!fragmentPopped){ //fragment not in back stack, create it.
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, postDraftFragment);
+            ft.replace(R.id.flContainer, destFragment);
             ft.addToBackStack(backStateName);
             ft.commit();
         }
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("song", Parcels.wrap(song));
-        postDraftFragment.setArguments(bundle);
+        destFragment.setArguments(bundle);
 
-        fragmentManager.beginTransaction().replace(R.id.flContainer,postDraftFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
-    public void goToPlaylistFragment(Song song){
-        Fragment playlistFragment = new PlaylistAddFragment();
-        String backStateName = playlistFragment.getClass().getName();
-
-        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
-
-        if (!fragmentPopped){ //fragment not in back stack, create it.
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, playlistFragment);
-            ft.addToBackStack(backStateName);
-            ft.commit();
-        }
-
-        Bundle bundle = new Bundle();
-        bundle.putString("token",accessToken);
-        bundle.putParcelable("song", Parcels.wrap(song));
-        playlistFragment.setArguments(bundle);
-
-        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
-    }
 }

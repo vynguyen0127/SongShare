@@ -20,6 +20,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
+import com.example.songshare.fragments.PlaylistAddFragment;
+import com.example.songshare.fragments.PostDraftFragment;
 import com.example.songshare.fragments.ResultFragment;
 import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.models.Song;
@@ -235,10 +237,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             if(position != RecyclerView.NO_POSITION){
                 Song song = songs.get(position);
                 if(fragment instanceof SearchFragment){
-                    ((SearchFragment)fragment).goToPostDraftFragment(song);
+                    ((SearchFragment)fragment).goToFragment(song, new PostDraftFragment());
                 }
                 else if(fragment instanceof ResultFragment){
-                    ((ResultFragment)fragment).goToPostDraftFragment(song);
+                    ((ResultFragment)fragment).goToFragment(song, new PostDraftFragment());
                 }
                 else {
 //                    Intent i = new Intent(context, PostDraftActivity.class);
@@ -256,10 +258,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             if(position != RecyclerView.NO_POSITION){
                 Song song = songs.get(position);
                 if(fragment instanceof SearchFragment){
-                    ((SearchFragment)fragment).goToPlaylistFragment(song);
+                    ((SearchFragment)fragment).goToFragment(song,new PlaylistAddFragment());
                 }
                 else if(fragment instanceof ResultFragment){
-                    ((ResultFragment)fragment).goToPlaylistFragment(song);
+                    ((ResultFragment)fragment).goToFragment(song, new PlaylistAddFragment());
                 }
                 else {
 //                    Intent i = new Intent(context, PlaylistAddActivity.class);

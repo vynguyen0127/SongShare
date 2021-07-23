@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -99,44 +100,54 @@
             android:layout_height="1dp"
             android:background="?android:attr/listDivider" />
 
-        <TextView
-            android:id="@+id/tvCaption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginBottom="10dp"
-            android:fontFamily="@font/baloo"
-            tools:text="this is my favorite song!1!!">
-
-        </TextView>
-
         <LinearLayout
+            android:id="@+id/layoutCap"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:visibility="gone"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvCreatedAt"
-                android:layout_width="@dimen/title_width"
+                android:id="@+id/tvCaption"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="25dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="25dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/baloo"
-                android:textSize="12sp"
-                tools:text="2 days ago" />
+                tools:text="this is my favorite song!1!!">
 
-            <ImageButton
-                android:id="@+id/ibLike"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="100dp"
-                android:background="#00FFFFFF"
-                android:clickable="true"
-                android:scaleType="centerCrop"
-                card_view:srcCompat="@drawable/ufi_heart" />
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCreatedAt"
+                    android:layout_width="@dimen/title_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/baloo"
+                    android:textSize="12sp"
+                    tools:text="2 days ago" />
+
+                <ImageButton
+                    android:id="@+id/ibLike"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="100dp"
+                    android:background="#00FFFFFF"
+                    android:clickable="true"
+                    android:scaleType="centerCrop"
+                    card_view:srcCompat="@drawable/ufi_heart" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

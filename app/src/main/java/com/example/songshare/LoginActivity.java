@@ -14,6 +14,8 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "LoginActivity";
@@ -21,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText etPassword;
     Button btnLogin;
     Button btnSignUp;
+    String uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
             Log.i(TAG,"Logging in previous user");
             goMainActivity();
         }
+        uri = getIntent().getStringExtra("uri");
+        Log.i(TAG,"uri: " + uri);
 
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
@@ -44,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 loginUser(username,password);
+                // do account check
             }
         });
 
@@ -67,8 +73,13 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,"Error logging in: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                goMainActivity();
-                Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
+                if(Objects.equals(uri, ParseUser.getCurrentUser().get("spotify_uri").toString())) {
+                    goMainActivity();
+                    Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(LoginActivity.this, "Uri: " + uri + " ,Spotify: " + ParseUser.getCurrentUser().get("spotify_uri"), Toast.LENGTH_SHORT).show();
+                    ParseUser.logOut();
+                }
             }
         });
     }

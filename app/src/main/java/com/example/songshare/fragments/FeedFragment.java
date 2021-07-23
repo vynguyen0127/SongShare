@@ -109,36 +109,44 @@ public class FeedFragment extends Fragment {
 
         fragmentManager = getActivity().getSupportFragmentManager();
 
+
         itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
+                Log.i(TAG,"onMove");
                 return false;
             }
 
+
             @Override
             public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                Log.i(TAG,"onSwipe");
+                Post post = allPosts.get(viewHolder.getAdapterPosition());
+                Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
                 if(direction == ItemTouchHelper.RIGHT) {
                     accessToken = fetchToken();
 
-                    Post post = allPosts.get(viewHolder.getAdapterPosition());
-
                     rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
-                    Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
 
-                    goToPlaylistFragment(song);
+                    goToFragment(song, new PlaylistAddFragment());
 
                 }
                 else {
                     Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
                     rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
 
+                    goToFragment(song, new PostDetailFragment());
+
                 }
 
             }
+
+
         };
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
 
     }
+
 
     private void queryPosts() {
         progress.setVisibility(ProgressBar.VISIBLE);
@@ -183,18 +191,18 @@ public class FeedFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        adapter.disconnectRemote();
+        adapter.disconnectRemote();
     }
 
-    private void goToPlaylistFragment(Song song){
-        Fragment playlistFragment = new PlaylistAddFragment();
-        String backStateName = playlistFragment.getClass().getName();
+    private void goToFragment(Song song,Fragment fragment){
+        Fragment destFragment =  fragment;
+        String backStateName = destFragment.getClass().getName();
 
         boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
 
         if (!fragmentPopped){ //fragment not in back stack, create it.
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, playlistFragment);
+            ft.replace(R.id.flContainer, destFragment);
             ft.addToBackStack(backStateName);
             ft.commit();
         }
@@ -202,9 +210,9 @@ public class FeedFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putString("token",accessToken);
         bundle.putParcelable("song", Parcels.wrap(song));
-        playlistFragment.setArguments(bundle);
+        destFragment.setArguments(bundle);
 
-        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
 
