@@ -128,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
-
+        ((SearchFragment) searchFragment).setToken(accessToken);
+        ((ProfileFragment) profileFragment).setToken(accessToken);
+        ((RecommendFragment) recommendFragment).setToken(accessToken);
 //        authorizeAccount();
     }
 

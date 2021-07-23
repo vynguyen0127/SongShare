@@ -1,17 +1,24 @@
-package com.example.songshare;
+package com.example.songshare.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.songshare.R;
 import com.example.songshare.adapters.PlaylistAdapter;
 import com.example.songshare.models.Playlist;
 import com.example.songshare.models.Song;
@@ -36,7 +43,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class PlaylistAddActivity extends AppCompatActivity {
+public class PlaylistAddFragment extends Fragment {
 
     private Song song;
     private TextView tvSongTitle;
@@ -46,39 +53,57 @@ public class PlaylistAddActivity extends AppCompatActivity {
     private RecyclerView rvPlaylists;
     private List<Playlist> playlists;
     private PlaylistAdapter adapter;
-    
+
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private String accessToken;
     private String currentUserUri;
 
     public static final String TAG = "PlaylistAddActivity";
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playlist_add);
 
-        song = Parcels.unwrap(getIntent().getParcelableExtra("Song"));
-        accessToken = getIntent().getStringExtra("Token");
+    public PlaylistAddFragment(){
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
+        return inflater.inflate(R.layout.fragment_playlist_add, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = this.getArguments();
+
+        song = Parcels.unwrap(bundle.getParcelable("song"));
+        accessToken = bundle.getString("token");
         currentUserUri = (String) ParseUser.getCurrentUser().get("spotify_uri");
 
-        tvSongTitle = findViewById(R.id.tvTitle);
-        tvArtist = findViewById(R.id.tvArtist);
-        ivAlbum = findViewById(R.id.ivCover);
-        rvPlaylists = findViewById(R.id.rvPlaylists);
-        tvHint = findViewById(R.id.tvHint);
-        
+        tvSongTitle = view.findViewById(R.id.tvTitle);
+        tvArtist = view.findViewById(R.id.tvArtist);
+        ivAlbum = view.findViewById(R.id.ivCover);
+        rvPlaylists = view.findViewById(R.id.rvPlaylists);
+        tvHint = view.findViewById(R.id.tvHint);
+
         tvSongTitle.setText(song.getSongTitle());
         tvArtist.setText(song.getArtistName());
-        Glide.with(PlaylistAddActivity.this)
+        Glide.with(getContext())
                 .load(song.getAlbumUrl())
                 .into(ivAlbum);
-        
+
         playlists = new ArrayList<>();
-//        adapter = new PlaylistAdapter(PlaylistAddActivity.this,playlists);
-        
+        adapter = new PlaylistAdapter(getContext(),playlists,PlaylistAddFragment.this);
+
         rvPlaylists.setAdapter(adapter);
-        rvPlaylists.setLayoutManager(new LinearLayoutManager(PlaylistAddActivity.this));
+        rvPlaylists.setLayoutManager(new LinearLayoutManager(getContext()));
 
         makeRequest();
     }
@@ -92,7 +117,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
                 .build();
 
         call(request);
-        
+
     }
 
     private String getUrl(){
@@ -179,7 +204,8 @@ public class PlaylistAddActivity extends AppCompatActivity {
             }
         });
 
-        finish();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.popBackStackImmediate();
     }
 
 }

@@ -1,6 +1,5 @@
 package com.example.songshare.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,13 +13,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.songshare.MainActivity;
-import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.PostsAdapter;
 import com.example.songshare.models.Post;
@@ -46,7 +46,7 @@ public class FeedFragment extends Fragment {
     private String accessToken;
     private ProgressBar progress;
     private SwipeRefreshLayout swipeContainer;
-
+    FragmentManager fragmentManager;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -106,7 +106,7 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-
+        fragmentManager = getActivity().getSupportFragmentManager();
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
 
     }
@@ -175,11 +175,30 @@ public class FeedFragment extends Fragment {
 
                 rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
                 Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
+//
+//                Intent i = new Intent(getContext(), PlaylistAddActivity.class);
+//                i.putExtra("Song", Parcels.wrap(song));
+//                i.putExtra("Token", accessToken);
+//                startActivity(i);
 
-                Intent i = new Intent(getContext(), PlaylistAddActivity.class);
-                i.putExtra("Song", Parcels.wrap(song));
-                i.putExtra("Token", accessToken);
-                startActivity(i);
+                Fragment playlistFragment = new PlaylistAddFragment();
+                String backStateName = playlistFragment.getClass().getName();
+
+                boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+                if (!fragmentPopped){ //fragment not in back stack, create it.
+                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                    ft.replace(R.id.flContainer, playlistFragment);
+                    ft.addToBackStack(backStateName);
+                    ft.commit();
+                }
+
+                Bundle bundle = new Bundle();
+                bundle.putString("token",accessToken);
+                bundle.putParcelable("song", Parcels.wrap(song));
+                playlistFragment.setArguments(bundle);
+
+                fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
 
             }
             else {
