@@ -75,7 +75,7 @@ public class PlaylistAddActivity extends AppCompatActivity {
                 .into(ivAlbum);
         
         playlists = new ArrayList<>();
-//        adapter = new PlaylistAdapter(PlaylistAddActivity.this,playlists);
+        adapter = new PlaylistAdapter(PlaylistAddActivity.this,playlists);
         
         rvPlaylists.setAdapter(adapter);
         rvPlaylists.setLayoutManager(new LinearLayoutManager(PlaylistAddActivity.this));

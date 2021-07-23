@@ -66,6 +66,8 @@ public class RecommendFragment extends Fragment {
     ArrayList<String> seed_genres;
 
     HashMap<String,String> seen_artists;
+    ItemTouchHelper.SimpleCallback songCallback;
+    ItemTouchHelper.SimpleCallback artistCallback;
 
     String accessToken;
     int numArtists;
@@ -119,9 +121,6 @@ public class RecommendFragment extends Fragment {
         rvArtists.setLayoutManager(linearLayoutManager2);
         rvArtists.setAdapter(artistAdapter);
 
-        new ItemTouchHelper(songCallback).attachToRecyclerView(rvSongs);
-        new ItemTouchHelper(artistCallback).attachToRecyclerView(rvArtists);
-
         seed_artists = new ArrayList<>();
         seed_genres = new ArrayList<>();
         seed_songs = new ArrayList<>();
@@ -147,6 +146,86 @@ public class RecommendFragment extends Fragment {
             }
         });
 
+        songCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if(direction == ItemTouchHelper.RIGHT){
+                    if(numSongs == 0){
+                        Toast.makeText(getContext(),"You have reached the max number of songs",Toast.LENGTH_SHORT).show();
+                        rvSongs.getAdapter().notifyDataSetChanged();
+                    }
+                    else if(numSongs > 0) {
+                        // add song id to seed_songs array
+                        seed_songs.add(songs.get(viewHolder.getAdapterPosition()).getSongId());
+                        numSongs--;
+                        Toast.makeText(getContext(), String.valueOf(numSongs) + String.format(" %s remaining.", (numSongs == 1 ? "song" : "songs")), Toast.LENGTH_SHORT).show();
+                        songs.remove(viewHolder.getAdapterPosition());
+                        rvSongs.getAdapter().notifyDataSetChanged();
+                        rvSongs.smoothScrollToPosition(0);
+                    }
+                    else{
+                        songs.remove(viewHolder.getAdapterPosition());
+                        rvSongs.getAdapter().notifyDataSetChanged();
+                        rvSongs.smoothScrollToPosition(0);
+                    }
+                }
+
+
+            }
+
+
+        };
+
+            artistCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if(direction == ItemTouchHelper.RIGHT){
+                    if(numArtists == 0){
+                        Toast.makeText(getContext(),"You have reached the max number of artists",Toast.LENGTH_SHORT).show();
+                        rvArtists.getAdapter().notifyDataSetChanged();
+                    }
+                    else if(numArtists > 0) {
+                        // add artist id to seed_songs array
+                        String id = artists.get(viewHolder.getAdapterPosition()).getArtistId();
+                        seed_artists.add(id);
+                        numArtists--;
+                        Toast.makeText(getContext(), String.valueOf(numArtists) + String.format(" %s remaining.", (numArtists == 1 ? "artist" : "artists")), Toast.LENGTH_SHORT).show();
+
+                        // use artist id to get related artists
+                        fetchRelatedArtists(id);
+
+                        // get artist info
+                        fetchArtistGenres(id);
+                        artists.remove(viewHolder.getAdapterPosition());
+                        rvArtists.getAdapter().notifyDataSetChanged();
+                        rvArtists.smoothScrollToPosition(0);
+                    }
+
+                }
+                else{
+                    artists.remove(viewHolder.getAdapterPosition());
+                    rvArtists.getAdapter().notifyDataSetChanged();
+                    rvArtists.smoothScrollToPosition(0);
+                }
+
+
+
+            }
+
+        };
+
+        new ItemTouchHelper(songCallback).attachToRecyclerView(rvSongs);
+        new ItemTouchHelper(artistCallback).attachToRecyclerView(rvArtists);
     }
 
     @Override
@@ -184,84 +263,6 @@ public class RecommendFragment extends Fragment {
         });
     }
 
-
-    ItemTouchHelper.SimpleCallback songCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
-        @Override
-        public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-            if(direction == ItemTouchHelper.RIGHT){
-                if(numSongs == 0){
-                    Toast.makeText(getContext(),"You have reached the max number of songs",Toast.LENGTH_SHORT).show();
-                    rvSongs.getAdapter().notifyDataSetChanged();
-                }
-                else if(numSongs > 0) {
-                    // add song id to seed_songs array
-                    seed_songs.add(songs.get(viewHolder.getAdapterPosition()).getSongId());
-                    numSongs--;
-                    Toast.makeText(getContext(), String.valueOf(numSongs) + String.format(" %s remaining.", (numSongs == 1 ? "song" : "songs")), Toast.LENGTH_SHORT).show();
-                    songs.remove(viewHolder.getAdapterPosition());
-                    rvSongs.getAdapter().notifyDataSetChanged();
-                    rvSongs.smoothScrollToPosition(0);
-                }
-                else{
-                    songs.remove(viewHolder.getAdapterPosition());
-                    rvSongs.getAdapter().notifyDataSetChanged();
-                    rvSongs.smoothScrollToPosition(0);
-                }
-            }
-
-
-        }
-
-
-    };
-
-    ItemTouchHelper.SimpleCallback artistCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
-        @Override
-        public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-            if(direction == ItemTouchHelper.RIGHT){
-                if(numArtists == 0){
-                    Toast.makeText(getContext(),"You have reached the max number of artists",Toast.LENGTH_SHORT).show();
-                    rvArtists.getAdapter().notifyDataSetChanged();
-                }
-                else if(numArtists > 0) {
-                    // add artist id to seed_songs array
-                    String id = artists.get(viewHolder.getAdapterPosition()).getArtistId();
-                    seed_artists.add(id);
-                    numArtists--;
-                    Toast.makeText(getContext(), String.valueOf(numArtists) + String.format(" %s remaining.", (numArtists == 1 ? "artist" : "artists")), Toast.LENGTH_SHORT).show();
-
-                    // use artist id to get related artists
-                    fetchRelatedArtists(id);
-
-                    // get artist info
-                    fetchArtistGenres(id);
-                    artists.remove(viewHolder.getAdapterPosition());
-                    rvArtists.getAdapter().notifyDataSetChanged();
-                    rvArtists.smoothScrollToPosition(0);
-                }
-
-            }
-            else{
-                artists.remove(viewHolder.getAdapterPosition());
-                rvArtists.getAdapter().notifyDataSetChanged();
-                rvArtists.smoothScrollToPosition(0);
-            }
-
-
-
-        }
-
-    };
 
     private void fetchArtistGenres(String id) {
         makeRequest(id,false);

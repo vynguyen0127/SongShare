@@ -8,10 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
 import com.example.songshare.fragments.PlaylistAddFragment;
 import com.example.songshare.models.Playlist;
@@ -24,9 +26,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
     Context context;
     List<Playlist> playlists;
-    PlaylistAddFragment fragment;
+    Fragment fragment;
 
-    public PlaylistAdapter(Context context, List<Playlist> playlists, PlaylistAddFragment fragment){
+    public PlaylistAdapter(Context context, List<Playlist> playlists){
+        this.context = context;
+        this.playlists = playlists;
+    }
+
+    public PlaylistAdapter(Context context, List<Playlist> playlists, Fragment fragment){
         this.context = context;
         this.playlists = playlists;
         this.fragment = fragment;
@@ -88,8 +95,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         @Override
         public void onClick(View v) {
             Playlist item = playlists.get(getAdapterPosition());
-//            ((PlaylistAddActivity)context).addSong(item.getPlaylistId());
-            fragment.addSong(item.getPlaylistId());
+            if(fragment == null)
+                ((PlaylistAddActivity)context).addSong(item.getPlaylistId());
+            else
+                ((PlaylistAddFragment)fragment).addSong(item.getPlaylistId());
 
 
         }

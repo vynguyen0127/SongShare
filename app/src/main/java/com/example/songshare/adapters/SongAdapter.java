@@ -14,13 +14,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.MainActivity;
-import com.example.songshare.PostDraftActivity;
+import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
+import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.models.Song;
 import com.spotify.android.appremote.api.ConnectionParams;
 import com.spotify.android.appremote.api.Connector;
@@ -41,20 +43,31 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     private Context context;
     private SpotifyAppRemote remote;
     MainActivity.songMode songMode;
+    Fragment fragment;
+
     String token;
     String uri;
-
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
 
     public static final String TAG = "SongAdapter";
 
+    public SongAdapter(Context context, List<Song> songs, MainActivity.songMode songMode, Fragment fragment){
+        this.context = context;
+        this.songs = songs;
+        this.songMode = songMode;
+        this.fragment = fragment;
+
+        connectRemote();
+
+    }
     public SongAdapter(Context context, List<Song> songs, MainActivity.songMode songMode){
         this.context = context;
         this.songs = songs;
         this.songMode = songMode;
 
         connectRemote();
+
     }
 
     public void setToken(String token){
@@ -223,22 +236,25 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             Log.i(TAG,"Song clicked!");
             if(position != RecyclerView.NO_POSITION){
                 Song song = songs.get(position);
-                Intent i = new Intent(context, PostDraftActivity.class);
-                i.putExtra("Song", Parcels.wrap(song));
-                context.startActivity(i);
+                if(fragment instanceof SearchFragment){
+                    ((SearchFragment)fragment).goToPostDraftFragment(song);
+                }
+
             }
+
+
         }
 
         @Override
         public boolean onLongClick(View v) {
-//            int position = getAdapterPosition();
-//            if(position != RecyclerView.NO_POSITION){
-//                Intent i = new Intent(context, PlaylistAddActivity.class);
-//                i.putExtra("Song",Parcels.wrap(songs.get(position)));
-//                i.putExtra("Token",token);
-//                context.startActivity(i);
-//
-//            }
+            int position = getAdapterPosition();
+            if(position != RecyclerView.NO_POSITION){
+                Intent i = new Intent(context, PlaylistAddActivity.class);
+                i.putExtra("Song",Parcels.wrap(songs.get(position)));
+                i.putExtra("Token",token);
+                context.startActivity(i);
+
+            }
             return false;
         }
     }

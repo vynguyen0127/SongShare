@@ -47,6 +47,7 @@ public class FeedFragment extends Fragment {
     private ProgressBar progress;
     private SwipeRefreshLayout swipeContainer;
     FragmentManager fragmentManager;
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -107,6 +108,34 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_red_light);
 
         fragmentManager = getActivity().getSupportFragmentManager();
+
+        itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if(direction == ItemTouchHelper.RIGHT) {
+                    accessToken = fetchToken();
+
+                    Post post = allPosts.get(viewHolder.getAdapterPosition());
+
+                    rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+                    Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
+
+                    goToPlaylistFragment(song);
+
+                }
+                else {
+                    Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
+                    rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+
+                }
+
+            }
+        };
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
 
     }
@@ -145,8 +174,6 @@ public class FeedFragment extends Fragment {
         return ((MainActivity)this.getActivity()).getAccessToken();
     }
 
-    private String fetchUserUri(){ return ((MainActivity)this.getActivity()).getCurrentUserUri(); }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -156,59 +183,29 @@ public class FeedFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        adapter.disconnectRemote();
+//        adapter.disconnectRemote();
     }
 
-    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-        @Override
-        public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-            return false;
+    private void goToPlaylistFragment(Song song){
+        Fragment playlistFragment = new PlaylistAddFragment();
+        String backStateName = playlistFragment.getClass().getName();
+
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, playlistFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
         }
 
-        @Override
-        public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-            if(direction == ItemTouchHelper.RIGHT) {
-                accessToken = fetchToken();
-                final String uri = fetchUserUri();
+        Bundle bundle = new Bundle();
+        bundle.putString("token",accessToken);
+        bundle.putParcelable("song", Parcels.wrap(song));
+        playlistFragment.setArguments(bundle);
 
-                Post post = allPosts.get(viewHolder.getAdapterPosition());
-
-                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
-                Song song = new Song(post.getAlbumURL(),post.getArtist(),post.getSongTitle(),post.getSongUri(),"");
-//
-//                Intent i = new Intent(getContext(), PlaylistAddActivity.class);
-//                i.putExtra("Song", Parcels.wrap(song));
-//                i.putExtra("Token", accessToken);
-//                startActivity(i);
-
-                Fragment playlistFragment = new PlaylistAddFragment();
-                String backStateName = playlistFragment.getClass().getName();
-
-                boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
-
-                if (!fragmentPopped){ //fragment not in back stack, create it.
-                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.replace(R.id.flContainer, playlistFragment);
-                    ft.addToBackStack(backStateName);
-                    ft.commit();
-                }
-
-                Bundle bundle = new Bundle();
-                bundle.putString("token",accessToken);
-                bundle.putParcelable("song", Parcels.wrap(song));
-                playlistFragment.setArguments(bundle);
-
-                fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
-
-            }
-            else {
-                Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
-                rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
-
-            }
-
-        }
-    };
+        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
+    }
 
 
 }

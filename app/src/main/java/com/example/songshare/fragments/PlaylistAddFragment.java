@@ -206,6 +206,7 @@ public class PlaylistAddFragment extends Fragment {
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.popBackStackImmediate();
+
     }
 
 }

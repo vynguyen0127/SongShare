@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,11 +46,12 @@ import okhttp3.Response;
 
 public class SearchFragment extends Fragment {
 
-    public static final String TAG = "ComposeFragment";
+    public static final String TAG = "SearchFragment";
     private RecyclerView rvResults;
     private List<Song> songs;
     private SongAdapter adapter;
     private ProgressBar progress;
+    FragmentManager fragmentManager;
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private String accessToken;
@@ -95,7 +99,7 @@ public class SearchFragment extends Fragment {
         rvResults = view.findViewById(R.id.rvResults);
 
         songs = new ArrayList<>();
-        adapter = new SongAdapter(getContext(),songs, MainActivity.songMode.SEARCH);
+        adapter = new SongAdapter(getContext(),songs, MainActivity.songMode.SEARCH, SearchFragment.this);
         adapter.setToken(accessToken);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
@@ -103,7 +107,7 @@ public class SearchFragment extends Fragment {
         rvResults.setLayoutManager(gridLayoutManager);
 
         progress = (ProgressBar) view.findViewById(R.id.progress);
-
+        fragmentManager = getActivity().getSupportFragmentManager();
     }
 
 
@@ -229,7 +233,25 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    public void goToPostDraftFragment(Song song){
+        Fragment postDraftFragment = new PostDraftFragment();
+        String backStateName = postDraftFragment.getClass().getName();
 
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, postDraftFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("song", Parcels.wrap(song));
+        postDraftFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,postDraftFragment).commit();
+    }
 
 
 

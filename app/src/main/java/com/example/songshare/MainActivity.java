@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment profileFragment;
     Fragment searchFragment;
     Fragment recommendFragment;
+    public static BottomNavigationView bottomNavigationView;
     private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private"
                         ,"user-library-read","playlist-read-collaborative","user-top-read"};
 
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
 
         feedFragment = new FeedFragment();
         profileFragment = new ProfileFragment();
@@ -146,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i(TAG,"onPause");
+        authorizeAccount();
     }
 
     public void authorizeAccount(){
