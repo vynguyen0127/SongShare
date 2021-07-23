@@ -1,18 +1,24 @@
-package com.example.songshare;
+package com.example.songshare.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.songshare.MainActivity;
+import com.example.songshare.R;
 import com.example.songshare.adapters.SongAdapter;
 import com.example.songshare.models.Song;
 
@@ -20,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +39,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class RecommendActivity extends AppCompatActivity {
+public class ResultFragment extends Fragment {
 
     public static final String TAG = "RecommendActivity";
     private String accessToken;
@@ -45,6 +52,7 @@ public class RecommendActivity extends AppCompatActivity {
     ArrayList<String> seed_artists;
     ArrayList<String> seed_songs;
     ArrayList<String> seed_genres;
+    FragmentManager fragmentManager;
 
     String artistsString;
     String songsString;
@@ -52,31 +60,45 @@ public class RecommendActivity extends AppCompatActivity {
     String uri;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recommend);
 
-        seed_artists = getIntent().getStringArrayListExtra("artists");
-        seed_genres = getIntent().getStringArrayListExtra("genres");
-        seed_songs = getIntent().getStringArrayListExtra("songs");
-        accessToken = getIntent().getStringExtra("token");
-        uri = getIntent().getStringExtra("uri");
 
+    }
+
+    @Nullable
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_result, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle bundle = this.getArguments();
+        seed_artists = bundle.getStringArrayList("artists");
+        seed_genres = bundle.getStringArrayList("genres");
+        seed_songs = bundle.getStringArrayList("songs");
+        accessToken = bundle.getString("token");
+        uri = bundle.getString("uri");
+        fragmentManager = getActivity().getSupportFragmentManager();
         artistsString = arrayToString(seed_artists);
         songsString = arrayToString(seed_songs);
         genresString = arrayToString(seed_genres);
 
-        rvResults = findViewById(R.id.rvResults);
+        rvResults = view.findViewById(R.id.rvResults);
 
         results = new ArrayList<>();
-        adapter = new SongAdapter(RecommendActivity.this,results, MainActivity.songMode.RECOMMEND);
+        adapter = new SongAdapter(getContext(),results, MainActivity.songMode.RECOMMEND,ResultFragment.this);
         adapter.setToken(accessToken);
         adapter.setUri(uri);
 
         rvResults.setAdapter(adapter);
-        rvResults.setLayoutManager(new GridLayoutManager(RecommendActivity.this,2));
+        rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
 
         makeRequest();
+
     }
 
     private String arrayToString(ArrayList<String> seed) {
@@ -160,22 +182,44 @@ public class RecommendActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public void goToPostDraftFragment(Song song){
+        Fragment postDraftFragment = new PostDraftFragment();
+        String backStateName = postDraftFragment.getClass().getName();
 
-        getMenuInflater().inflate(R.menu.menu_post_detail,menu);
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
 
-        return true;
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, postDraftFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("song", Parcels.wrap(song));
+        postDraftFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,postDraftFragment).commit();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public void goToPlaylistFragment(Song song){
+        Fragment playlistFragment = new PlaylistAddFragment();
+        String backStateName = playlistFragment.getClass().getName();
 
-        if(item.getItemId() == R.id.exit){
-            Intent i = new Intent(RecommendActivity.this,MainActivity.class);
-            startActivity(i);
-            finish();
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, playlistFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
         }
-        return super.onOptionsItemSelected(item);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("token",accessToken);
+        bundle.putParcelable("song", Parcels.wrap(song));
+        playlistFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
     }
 }

@@ -1,7 +1,6 @@
 package com.example.songshare.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.songshare.MainActivity;
-import com.example.songshare.PlaylistAddActivity;
 import com.example.songshare.R;
+import com.example.songshare.fragments.ResultFragment;
 import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.models.Song;
 import com.spotify.android.appremote.api.ConnectionParams;
@@ -33,7 +32,6 @@ import com.spotify.android.appremote.api.error.SpotifyConnectionTerminatedExcept
 import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -239,7 +237,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 if(fragment instanceof SearchFragment){
                     ((SearchFragment)fragment).goToPostDraftFragment(song);
                 }
-
+                else if(fragment instanceof ResultFragment){
+                    ((ResultFragment)fragment).goToPostDraftFragment(song);
+                }
+                else {
+//                    Intent i = new Intent(context, PostDraftActivity.class);
+//                    i.putExtra("Song", Parcels.wrap(song));
+//                    context.startActivity(i);
+                }
             }
 
 
@@ -249,10 +254,19 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         public boolean onLongClick(View v) {
             int position = getAdapterPosition();
             if(position != RecyclerView.NO_POSITION){
-                Intent i = new Intent(context, PlaylistAddActivity.class);
-                i.putExtra("Song",Parcels.wrap(songs.get(position)));
-                i.putExtra("Token",token);
-                context.startActivity(i);
+                Song song = songs.get(position);
+                if(fragment instanceof SearchFragment){
+                    ((SearchFragment)fragment).goToPlaylistFragment(song);
+                }
+                else if(fragment instanceof ResultFragment){
+                    ((ResultFragment)fragment).goToPlaylistFragment(song);
+                }
+                else {
+//                    Intent i = new Intent(context, PlaylistAddActivity.class);
+//                    i.putExtra("Song", Parcels.wrap(songs.get(position)));
+//                    i.putExtra("Token", token);
+//                    context.startActivity(i);
+                }
 
             }
             return false;

@@ -58,7 +58,7 @@ public class PlaylistAddFragment extends Fragment {
     private String accessToken;
     private String currentUserUri;
 
-    public static final String TAG = "PlaylistAddActivity";
+    public static final String TAG = "PlaylistAddFragment";
 
     public PlaylistAddFragment(){
 

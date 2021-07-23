@@ -33,7 +33,7 @@ import org.parceler.Parcels;
 
 public class PostDraftFragment extends Fragment {
 
-    public static final String TAG = "PostDraftActivity";
+    public static final String TAG = "PostDraftFragment";
     Song song;
 
     ImageView ivAlbum;

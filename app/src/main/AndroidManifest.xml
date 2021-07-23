@@ -21,9 +21,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".RecommendActivity" />
-        <activity android:name=".PostDraftActivity" />
-        <activity android:name=".PlaylistAddActivity" />
         <activity android:name=".LoginActivity">
         </activity>
         <activity android:name=".MainActivity" />

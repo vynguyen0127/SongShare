@@ -1,6 +1,5 @@
 package com.example.songshare.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,6 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.songshare.MainActivity;
 import com.example.songshare.OverlapDecoration;
 import com.example.songshare.R;
-import com.example.songshare.RecommendActivity;
 import com.example.songshare.adapters.ArtistAdapter;
 import com.example.songshare.adapters.SongAdapter;
 import com.example.songshare.models.Artist;
@@ -69,6 +69,7 @@ public class RecommendFragment extends Fragment {
     ItemTouchHelper.SimpleCallback songCallback;
     ItemTouchHelper.SimpleCallback artistCallback;
 
+    FragmentManager fragmentManager;
     String accessToken;
     int numArtists;
     int numSongs;
@@ -93,6 +94,7 @@ public class RecommendFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        fragmentManager = getActivity().getSupportFragmentManager();
         songs = new ArrayList<>();
         songAdapter = new SongAdapter(getContext(), songs, MainActivity.songMode.SEED);
 
@@ -136,13 +138,14 @@ public class RecommendFragment extends Fragment {
             public void onClick(View v) {
                 String uri = fetchUserUri();
                 Toast.makeText(getContext(),"Fetching new songs!",Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(getContext(), RecommendActivity.class);
-                i.putExtra("uri",uri);
-                i.putStringArrayListExtra("artists",seed_artists);
-                i.putStringArrayListExtra("songs",seed_songs);
-                i.putStringArrayListExtra("genres",seed_genres);
-                i.putExtra("token",accessToken);
-                startActivity(i);
+                goToResultFragment();
+//                Intent i = new Intent(getContext(), RecommendActivity.class);
+//                i.putExtra("uri",uri);
+//                i.putStringArrayListExtra("artists",seed_artists);
+//                i.putStringArrayListExtra("songs",seed_songs);
+//                i.putStringArrayListExtra("genres",seed_genres);
+//                i.putExtra("token",accessToken);
+//                startActivity(i);
             }
         });
 
@@ -226,6 +229,31 @@ public class RecommendFragment extends Fragment {
 
         new ItemTouchHelper(songCallback).attachToRecyclerView(rvSongs);
         new ItemTouchHelper(artistCallback).attachToRecyclerView(rvArtists);
+    }
+
+    private void goToResultFragment() {
+        Fragment resultFragment = new ResultFragment();
+        String backStateName = resultFragment.getClass().getName();
+
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, resultFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+        String uri = fetchUserUri();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("artists",seed_artists);
+        bundle.putStringArrayList("songs",seed_songs);
+        bundle.putStringArrayList("genres",seed_genres);
+        bundle.putString("token",accessToken);
+        bundle.putString("uri",uri);
+        resultFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,resultFragment).commit();
+
     }
 
     @Override

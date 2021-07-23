@@ -253,6 +253,25 @@ public class SearchFragment extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.flContainer,postDraftFragment).commit();
     }
 
+    public void goToPlaylistFragment(Song song){
+        Fragment playlistFragment = new PlaylistAddFragment();
+        String backStateName = playlistFragment.getClass().getName();
 
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, playlistFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("token",accessToken);
+        bundle.putParcelable("song", Parcels.wrap(song));
+        playlistFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,playlistFragment).commit();
+    }
 
 }
