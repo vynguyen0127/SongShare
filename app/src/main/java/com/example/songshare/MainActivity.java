@@ -85,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
 
         ParseObject.registerSubclass(Post.class);
 
+        currentUserUri = getIntent().getStringExtra("uri");
+        accessToken = getIntent().getStringExtra("token");
+        Log.i(TAG,"TOKEN: " + accessToken);
+
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
@@ -125,7 +129,21 @@ public class MainActivity extends AppCompatActivity {
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
 
-        authorizeAccount();
+//        authorizeAccount();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i(TAG,"onRestart");
+        Intent i = new Intent(MainActivity.this, SplashActivity.class);
+        startActivity(i);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG,"onPause");
     }
 
     public void authorizeAccount(){

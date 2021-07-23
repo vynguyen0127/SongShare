@@ -185,6 +185,7 @@ public class FeedFragment extends Fragment {
             else {
                 Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
                 rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
+
             }
 
         }
