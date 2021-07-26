@@ -79,7 +79,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        adapter.connectRemote();
+
         Log.i(TAG,"onResume");
     }
 
@@ -93,7 +93,7 @@ public class SearchFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG,"onDestroy");
-        adapter.disconnectRemote();
+
     }
 
     @Override

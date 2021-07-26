@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,14 +27,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
     public static final String TAG = "CustomSnackBar";
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String REDIRECT_URI = "http://localhost:8888/";
 
     private static SpotifyAppRemote mSpotifyAppRemote;
 
     static AppCompatSeekBar  mSeekBar;
     static TrackProgressBar mTrackProgressBar;
     static ImageButton mPlayPauseButton;
+    static TextView tvPlayerSong;
+    static TextView tvPlayerArtist;
 
     Subscription<PlayerState> mPlayerStateSubscription;
     Subscription<PlayerContext> mPlayerContextSubscription;
@@ -53,7 +54,8 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         // create snackbar with custom view
         ContentViewCallback callback= new ContentViewCallback(content);
         CustomSnackbar customSnackbar = new CustomSnackbar(parent, content, callback);
-
+        tvPlayerSong = content.findViewById(R.id.tvPlayerSong);
+        tvPlayerArtist = content.findViewById(R.id.tvPlayerArtist);
         // Remove black background padding on left and right
         customSnackbar.getView().setPadding(0, 0, 0, 0);
 
@@ -132,6 +134,8 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                             mSeekBar.setMax((int) playerState.track.duration);
                             mTrackProgressBar.setDuration(playerState.track.duration);
                             mTrackProgressBar.update(playerState.playbackPosition);
+                            tvPlayerArtist.setText(playerState.track.artist.name);
+                            tvPlayerSong.setText(playerState.track.name);
                         }
 
                         mSeekBar.setEnabled(true);
@@ -207,18 +211,6 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                                 .getPlayerApi()
                                 .subscribeToPlayerState()
                                 .setEventCallback(mPlayerStateEventCallback)
-                                .setLifecycleCallback(
-                                        new Subscription.LifecycleCallback() {
-                                            @Override
-                                            public void onStart() {
-                                                logMessage("Event: start");
-                                            }
-
-                                            @Override
-                                            public void onStop() {
-                                                logMessage("Event: end");
-                                            }
-                                        })
                                 .setErrorCallback(
                                         throwable -> {
                                             logError(throwable);

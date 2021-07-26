@@ -13,15 +13,21 @@
         android:layout_height="wrap_content"
         android:text="SONGS" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSongs"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:clipToPadding="true"
-        android:isScrollContainer="false"
-        android:nestedScrollingEnabled="false">
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/rvSongs"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:clipToPadding="true"-->
+<!--        android:isScrollContainer="false"-->
+<!--        android:nestedScrollingEnabled="false">-->
 
-    </androidx.recyclerview.widget.RecyclerView>
+<!--    </androidx.recyclerview.widget.RecyclerView>-->
+    <com.yuyakaido.android.cardstackview.CardStackView
+        android:id="@+id/csSongs"
+        android:layout_width="match_parent"
+        android:layout_height="275dp"
+        android:clipToPadding="false"
+        android:padding="4dp"></com.yuyakaido.android.cardstackview.CardStackView>
 
     <View
         android:id="@+id/divider"
@@ -35,15 +41,23 @@
         android:layout_height="wrap_content"
         android:text="ARTISTS" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvArtists"
+    <com.yuyakaido.android.cardstackview.CardStackView
+        android:id="@+id/csArtists"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="275dp"
         android:clipToPadding="false"
-        android:isScrollContainer="false"
-        android:nestedScrollingEnabled="false">
+        android:padding="4dp">
 
-    </androidx.recyclerview.widget.RecyclerView>
+    </com.yuyakaido.android.cardstackview.CardStackView>
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/rvArtists"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:clipToPadding="false"-->
+<!--        android:isScrollContainer="false"-->
+<!--        android:nestedScrollingEnabled="false">-->
+
+<!--    </androidx.recyclerview.widget.RecyclerView>-->
 
     <Button
         android:id="@+id/btnRecommend"

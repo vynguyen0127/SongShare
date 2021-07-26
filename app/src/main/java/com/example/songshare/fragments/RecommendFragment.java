@@ -19,17 +19,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.songshare.MainActivity;
-import com.example.songshare.OverlapDecoration;
 import com.example.songshare.R;
 import com.example.songshare.adapters.ArtistAdapter;
 import com.example.songshare.adapters.SongAdapter;
 import com.example.songshare.models.Artist;
 import com.example.songshare.models.Song;
+import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
+import com.yuyakaido.android.cardstackview.CardStackListener;
+import com.yuyakaido.android.cardstackview.CardStackView;
+import com.yuyakaido.android.cardstackview.Direction;
+import com.yuyakaido.android.cardstackview.StackFrom;
+import com.yuyakaido.android.cardstackview.SwipeableMethod;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -51,8 +53,8 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class RecommendFragment extends Fragment {
 
-    RecyclerView rvSongs;
-    RecyclerView rvArtists;
+    CardStackView csArtists;
+    CardStackView csSongs;
     Button btnRecommend;
 
     List<Song> songs;
@@ -66,8 +68,6 @@ public class RecommendFragment extends Fragment {
     ArrayList<String> seed_genres;
 
     HashMap<String,String> seen_artists;
-    ItemTouchHelper.SimpleCallback songCallback;
-    ItemTouchHelper.SimpleCallback artistCallback;
 
     FragmentManager fragmentManager;
     String accessToken;
@@ -95,37 +95,27 @@ public class RecommendFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         fragmentManager = getActivity().getSupportFragmentManager();
+
+        seed_artists = new ArrayList<>();
+        seed_genres = new ArrayList<>();
+        seed_songs = new ArrayList<>();
+
         songs = new ArrayList<>();
         songAdapter = new SongAdapter(getContext(), songs, MainActivity.songMode.SEED);
-
         songAdapter.setToken(accessToken);
 
         artists = new ArrayList<>();
         artistAdapter = new ArtistAdapter(getContext(), artists);
-
         seen_artists = new HashMap<>();
 
         addSongs();
         addArtists();
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setReverseLayout(true);
-        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext());
-        linearLayoutManager2.setReverseLayout(true);
+        csSongs = view.findViewById(R.id.csSongs);
+        csArtists = view.findViewById(R.id.csArtists);
 
-        rvSongs = view.findViewById(R.id.rvSongs);
-        rvSongs.addItemDecoration(new OverlapDecoration());
-        rvSongs.setLayoutManager(linearLayoutManager);
-        rvSongs.setAdapter(songAdapter);
-
-        rvArtists = view.findViewById(R.id.rvArtists);
-        rvArtists.addItemDecoration(new OverlapDecoration());
-        rvArtists.setLayoutManager(linearLayoutManager2);
-        rvArtists.setAdapter(artistAdapter);
-
-        seed_artists = new ArrayList<>();
-        seed_genres = new ArrayList<>();
-        seed_songs = new ArrayList<>();
+        setArtistStack();
+        setSongStack();
 
         showPopUpWindow(view);
 
@@ -139,67 +129,90 @@ public class RecommendFragment extends Fragment {
                 String uri = fetchUserUri();
                 Toast.makeText(getContext(),"Fetching new songs!",Toast.LENGTH_SHORT).show();
                 goToResultFragment();
-//                Intent i = new Intent(getContext(), RecommendActivity.class);
-//                i.putExtra("uri",uri);
-//                i.putStringArrayListExtra("artists",seed_artists);
-//                i.putStringArrayListExtra("songs",seed_songs);
-//                i.putStringArrayListExtra("genres",seed_genres);
-//                i.putExtra("token",accessToken);
-//                startActivity(i);
             }
         });
 
-        songCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+    }
+
+    private void setSongStack() {
+        CardStackLayoutManager songManager = new CardStackLayoutManager(getContext(),new CardStackListener() {
             @Override
-            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-                return false;
+            public void onCardDragging(Direction direction, float ratio) {
+
             }
 
             @Override
-            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-                if(direction == ItemTouchHelper.RIGHT){
+            public void onCardSwiped(Direction direction) {
+                Log.i(TAG, "onSwipe!");
+                if(direction == Direction.Right){
                     if(numSongs == 0){
                         Toast.makeText(getContext(),"You have reached the max number of songs",Toast.LENGTH_SHORT).show();
-                        rvSongs.getAdapter().notifyDataSetChanged();
+                        csSongs.rewind();
                     }
-                    else if(numSongs > 0) {
-                        // add song id to seed_songs array
-                        seed_songs.add(songs.get(viewHolder.getAdapterPosition()).getSongId());
+                    else {
+                        String songId = songs.get(0).getSongId();
+                        seed_songs.add(songId);
                         numSongs--;
                         Toast.makeText(getContext(), String.valueOf(numSongs) + String.format(" %s remaining.", (numSongs == 1 ? "song" : "songs")), Toast.LENGTH_SHORT).show();
-                        songs.remove(viewHolder.getAdapterPosition());
-                        rvSongs.getAdapter().notifyDataSetChanged();
-                        rvSongs.smoothScrollToPosition(0);
-                    }
-                    else{
-                        songs.remove(viewHolder.getAdapterPosition());
-                        rvSongs.getAdapter().notifyDataSetChanged();
-                        rvSongs.smoothScrollToPosition(0);
                     }
                 }
-
-
-            }
-
-
-        };
-
-            artistCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull @NotNull RecyclerView recyclerView, @NonNull @NotNull RecyclerView.ViewHolder viewHolder, @NonNull @NotNull RecyclerView.ViewHolder target) {
-                return false;
+                songs.remove(0);
+                csSongs.getAdapter().notifyDataSetChanged();
             }
 
             @Override
-            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
-                if(direction == ItemTouchHelper.RIGHT){
+            public void onCardRewound() {
+
+            }
+
+            @Override
+            public void onCardCanceled() {
+
+            }
+
+            @Override
+            public void onCardAppeared(View view, int position) {
+
+            }
+
+            @Override
+            public void onCardDisappeared(View view, int position) {
+
+            }
+        });
+
+        songManager.setStackFrom(StackFrom.None);
+        songManager.setVisibleCount(3);
+        songManager.setTranslationInterval(8.0f);
+        songManager.setScaleInterval(0.95f);
+        songManager.setSwipeThreshold(0.3f);
+        songManager.setMaxDegree(20.0f);
+        songManager.setDirections(Direction.HORIZONTAL);
+        songManager.setCanScrollHorizontal(true);
+        songManager.setCanScrollVertical(true);
+        songManager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
+
+
+        csSongs.setLayoutManager(songManager);
+        csSongs.setAdapter(songAdapter);
+    }
+
+    private void setArtistStack() {
+        CardStackLayoutManager artistManager = new CardStackLayoutManager(getContext(),new CardStackListener() {
+            @Override
+            public void onCardDragging(Direction direction, float ratio) {
+
+            }
+
+            @Override
+            public void onCardSwiped(Direction direction) {
+                if(direction == Direction.Right){
                     if(numArtists == 0){
                         Toast.makeText(getContext(),"You have reached the max number of artists",Toast.LENGTH_SHORT).show();
-                        rvArtists.getAdapter().notifyDataSetChanged();
                     }
                     else if(numArtists > 0) {
                         // add artist id to seed_songs array
-                        String id = artists.get(viewHolder.getAdapterPosition()).getArtistId();
+                        String id = artists.get(0).getArtistId();
                         seed_artists.add(id);
                         numArtists--;
                         Toast.makeText(getContext(), String.valueOf(numArtists) + String.format(" %s remaining.", (numArtists == 1 ? "artist" : "artists")), Toast.LENGTH_SHORT).show();
@@ -209,26 +222,53 @@ public class RecommendFragment extends Fragment {
 
                         // get artist info
                         fetchArtistGenres(id);
-                        artists.remove(viewHolder.getAdapterPosition());
-                        rvArtists.getAdapter().notifyDataSetChanged();
-                        rvArtists.smoothScrollToPosition(0);
+                        artists.remove(0);
+                        csArtists.getAdapter().notifyDataSetChanged();
                     }
 
                 }
                 else{
-                    artists.remove(viewHolder.getAdapterPosition());
-                    rvArtists.getAdapter().notifyDataSetChanged();
-                    rvArtists.smoothScrollToPosition(0);
+                    artists.remove(0);
+                    csArtists.getAdapter().notifyDataSetChanged();
                 }
-
 
 
             }
 
-        };
+            @Override
+            public void onCardRewound() {
 
-        new ItemTouchHelper(songCallback).attachToRecyclerView(rvSongs);
-        new ItemTouchHelper(artistCallback).attachToRecyclerView(rvArtists);
+            }
+
+            @Override
+            public void onCardCanceled() {
+
+            }
+
+            @Override
+            public void onCardAppeared(View view, int position) {
+
+            }
+
+            @Override
+            public void onCardDisappeared(View view, int position) {
+
+            }
+        });
+        artistManager.setStackFrom(StackFrom.None);
+        artistManager.setVisibleCount(3);
+        artistManager.setTranslationInterval(8.0f);
+        artistManager.setScaleInterval(0.95f);
+        artistManager.setSwipeThreshold(0.3f);
+        artistManager.setMaxDegree(20.0f);
+        artistManager.setDirections(Direction.HORIZONTAL);
+        artistManager.setCanScrollHorizontal(true);
+        artistManager.setCanScrollVertical(true);
+        artistManager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
+
+
+        csArtists.setLayoutManager(artistManager);
+        csArtists.setAdapter(artistAdapter);
     }
 
     private void goToResultFragment() {
@@ -334,7 +374,7 @@ public class RecommendFragment extends Fragment {
                             Artist artist = new Artist(jsonArtists.getJSONObject(i));
                             if(!seen_artists.containsKey(artist.getArtistId())) {
                                 seen_artists.put(artist.getArtistId(),"");
-                                artists.add(0, artist);
+                                artists.add(artist);
                             }
                         }
                         Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -403,4 +443,5 @@ public class RecommendFragment extends Fragment {
             }
         });
     }
+
 }
