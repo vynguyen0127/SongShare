@@ -5,4 +5,11 @@
     <dimen name="title_width">210dp</dimen>
     <dimen name="title_width_land">550dp</dimen>
     <dimen name="btn_play_dimen_land">75dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="cat_button_height">48sp</dimen>
+
+    <dimen name="cat_button_small_height">24sp</dimen>
+    <dimen name="cat_button_small_padding">19sp</dimen>
+    <dimen name="cat_button_small_corner_radius">12sp</dimen>
+    <dimen name="cat_button_small_border_width">1dp</dimen>
 </resources>

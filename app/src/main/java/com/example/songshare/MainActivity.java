@@ -28,6 +28,13 @@ import com.example.songshare.models.Post;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.spotify.android.appremote.api.ConnectionParams;
+import com.spotify.android.appremote.api.Connector;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
+import com.spotify.android.appremote.api.error.NotLoggedInException;
+import com.spotify.android.appremote.api.error.SpotifyConnectionTerminatedException;
+import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -77,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         ,"user-library-read","playlist-read-collaborative","user-top-read"};
 
     private OkHttpClient okHttpClient = new OkHttpClient();
+    public SpotifyAppRemote remote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
         ((SearchFragment) searchFragment).setToken(accessToken);
         ((ProfileFragment) profileFragment).setToken(accessToken);
         ((RecommendFragment) recommendFragment).setToken(accessToken);
-//        authorizeAccount();
+
+        connectRemote();
     }
 
     @Override
@@ -262,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
         if(item.getItemId() == R.id.logOut){
             logOutUser();
         }
+        else if(item.getItemId() == R.id.player){
+            showPlayer();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -306,5 +318,57 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void connectRemote(){
+        ConnectionParams connectionParams =
+                new ConnectionParams.Builder(CLIENT_ID)
+                        .setRedirectUri(REDIRECT_URI)
+                        .showAuthView(true)
+                        .build();
+
+        SpotifyAppRemote.connect(MainActivity.this, connectionParams,
+                new Connector.ConnectionListener() {
+
+                    @Override
+                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
+                        remote = spotifyAppRemote;
+                        Log.d(TAG, "Connected! Yay!");
+
+                        // Now you can start interacting with App Remote
+
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        Log.e(TAG, throwable.getMessage(), throwable);
+                        // Something went wrong when attempting to connect! Handle errors here
+
+                        // Occurs when Spotify app not downloaded
+                        if(throwable instanceof CouldNotFindSpotifyApp){
+                            Toast.makeText(MainActivity.this,"WARNING: Spotify App not downloaded, please download the app and try again.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User is not logged in to Spotify App
+                        else if(throwable instanceof NotLoggedInException){
+                            Toast.makeText(MainActivity.this,"WARNING: User is not logged into Spotify App.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when User does not give app permission to access Spotify Account
+                        else if(throwable instanceof UserNotAuthorizedException){
+                            Toast.makeText(MainActivity.this,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
+                        }
+                        // Occurs when app cannot connect to Spotify app
+                        else if(throwable instanceof SpotifyConnectionTerminatedException){
+                            Toast.makeText(MainActivity.this,"WARNING: Connection to Spotify app has been terminated. Please restart the app and try again.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+    }
+
+    public void showPlayer(){
+        CustomSnackbar customSnackbar = CustomSnackbar.make(findViewById(R.id.activity_main),CustomSnackbar.LENGTH_INDEFINITE,remote);
+        customSnackbar.setPlayer();
+        customSnackbar.setAction();
+        customSnackbar.setPlay();
+        customSnackbar.show();
     }
 }

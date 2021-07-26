@@ -6,4 +6,7 @@
         android:id="@+id/logOut"
         android:title="@string/log_out"
         app:showAsAction="collapseActionView" />
+    <item
+        android:id="@+id/player"
+        android:title="Player" />
 </menu>

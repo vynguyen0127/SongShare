@@ -1,28 +1,21 @@
-package com.example.songshare.fragments;
+package com.example.songshare;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatSeekBar;
-import androidx.fragment.app.Fragment;
+import androidx.core.view.ViewCompat;
 
-import com.bumptech.glide.Glide;
-import com.example.songshare.R;
-import com.example.songshare.models.Song;
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.ErrorCallback;
 import com.spotify.protocol.client.Subscription;
@@ -30,132 +23,157 @@ import com.spotify.protocol.types.PlayerContext;
 import com.spotify.protocol.types.PlayerState;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
-public class PostDetailFragment extends Fragment {
-    private Song song;
-    private TextView tvSongTitle;
-    private TextView tvArtist;
-    private ImageView ivAlbum;
-
-    public static final String TAG = "PostDetailFragment";
+public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
+    public static final String TAG = "CustomSnackBar";
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
 
     private static SpotifyAppRemote mSpotifyAppRemote;
 
-    AppCompatSeekBar mSeekBar;
-    TrackProgressBar mTrackProgressBar;
+    static AppCompatSeekBar  mSeekBar;
+    static TrackProgressBar mTrackProgressBar;
+    static ImageButton mPlayPauseButton;
 
     Subscription<PlayerState> mPlayerStateSubscription;
     Subscription<PlayerContext> mPlayerContextSubscription;
 
     private final ErrorCallback mErrorCallback = this::logError;
 
-    private final Subscription.EventCallback<PlayerState> mPlayerStateEventCallback =
-            new Subscription.EventCallback<PlayerState>() {
-                @Override
-                public void onEvent(PlayerState playerState) {
+    private Subscription.EventCallback<PlayerState> mPlayerStateEventCallback;
+    static View content;
 
-                    // Update progressbar
-                    if (playerState.playbackSpeed > 0) {
-                        mTrackProgressBar.unpause();
-                    } else {
-                        mTrackProgressBar.pause();
-                    }
+    protected CustomSnackbar(@NonNull @NotNull ViewGroup parent, @NonNull @NotNull View content, @NonNull @NotNull com.google.android.material.snackbar.ContentViewCallback contentViewCallback) {
+        super(parent, content, contentViewCallback);
+    }
+    public static CustomSnackbar make(ViewGroup parent, @Duration int duration,SpotifyAppRemote remote){
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        content = inflater.inflate(R.layout.custom_snackbar,parent,false);
+        mSpotifyAppRemote = remote;
+        // create snackbar with custom view
+        ContentViewCallback callback= new ContentViewCallback(content);
+        CustomSnackbar customSnackbar = new CustomSnackbar(parent, content, callback);
 
-                    if (playerState.track != null) {
-                        // Invalidate seekbar length and position
-                        mSeekBar.setMax((int) playerState.track.duration);
-                        mTrackProgressBar.setDuration(playerState.track.duration);
-                        mTrackProgressBar.update(playerState.playbackPosition);
-                    }
+        // Remove black background padding on left and right
+        customSnackbar.getView().setPadding(0, 0, 0, 0);
 
-                    mSeekBar.setEnabled(true);
-                }
-            };
-
-    public PostDetailFragment() {
-        // Required empty public constructor
+        // set snackbar duration
+        customSnackbar.setDuration(duration);
+        return customSnackbar;
     }
 
+    public CustomSnackbar setAction() {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+        content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        return this;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_post_detail, container, false);
+    public CustomSnackbar setPlay() {
+        ImageButton actionView = (ImageButton) getView().findViewById(R.id.play);
+        actionView.setVisibility(View.VISIBLE);
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSpotifyAppRemote
+                        .getPlayerApi()
+                        .getPlayerState()
+                        .setResultCallback(
+                                playerState -> {
+                                    if (playerState.isPaused) {
+                                        mSpotifyAppRemote
+                                                .getPlayerApi()
+                                                .resume();
+                                    } else {
+                                        mSpotifyAppRemote
+                                                .getPlayerApi()
+                                                .pause();
+                                    }
+                                });
+            }
+        });
+        return this;
     }
 
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Bundle bundle = this.getArguments();
-
-        song = Parcels.unwrap(bundle.getParcelable("song"));
-
-        tvSongTitle = view.findViewById(R.id.tvTitle);
-        tvArtist = view.findViewById(R.id.tvArtist);
-        ivAlbum = view.findViewById(R.id.ivCover);
-
-        tvSongTitle.setText(song.getSongTitle());
-        tvArtist.setText(song.getArtistName());
-        Glide.with(getContext())
-                .load(song.getAlbumUrl())
-                .into(ivAlbum);
-
-        mSeekBar = view.findViewById(R.id.seek_to);
+    public void setPlayer(){
+        mSeekBar = getView().findViewById(R.id.seek_to);
         mSeekBar.setEnabled(false);
         mSeekBar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         mSeekBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        mPlayPauseButton = getView().findViewById(R.id.play);
 
         mTrackProgressBar = new TrackProgressBar(mSeekBar);
 
-        onConnectAndAuthorizedClicked(null);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
-//        onDisconnected();
-    }
-
-
-    public void onConnectAndAuthorizedClicked(View view) {
-        connect(true);
-    }
-
-    private void connect(boolean showAuthView) {
-
-        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
-
-        SpotifyAppRemote.connect(
-                getContext(),
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(showAuthView)
-                        .build(),
-                new Connector.ConnectionListener() {
+        mPlayerStateEventCallback =
+                new Subscription.EventCallback<PlayerState>() {
                     @Override
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        mSpotifyAppRemote = spotifyAppRemote;
-                        onSubscribedToPlayerStateButtonClicked(null);
-                        onSubscribedToPlayerContextButtonClicked(null);
+                    public void onEvent(PlayerState playerState) {
+
+                        // Update progressbar
+                        if (playerState.playbackSpeed > 0) {
+                            mTrackProgressBar.unpause();
+                        } else {
+                            mTrackProgressBar.pause();
+                        }
+
+                        // Invalidate play / pause
+                        if (playerState.isPaused) {
+                            mPlayPauseButton.setImageResource(R.drawable.btn_play);
+                        } else {
+                            mPlayPauseButton.setImageResource(R.drawable.btn_pause);
+                        }
+
+                        if (playerState.track != null) {
+                            // Invalidate seekbar length and position
+                            mSeekBar.setMax((int) playerState.track.duration);
+                            mTrackProgressBar.setDuration(playerState.track.duration);
+                            mTrackProgressBar.update(playerState.playbackPosition);
+                        }
+
+                        mSeekBar.setEnabled(true);
                     }
+                };
+
+        onSubscribedToPlayerStateButtonClicked(null);
+        onSubscribedToPlayerContextButtonClicked(null);
+    }
 
 
-                    @Override
-                    public void onFailure(Throwable error) {
-                        logError(error);
-                    }
-                });
+    private static class ContentViewCallback implements
+            BaseTransientBottomBar.ContentViewCallback {
+
+        // view inflated from custom layout
+        private View content;
+
+        public ContentViewCallback(View content) {
+            this.content = content;
+        }
+
+        @Override
+        public void animateContentIn(int delay, int duration) {
+            // add custom *in animations for your views
+            // e.g. original snackbar uses alpha animation, from 0 to 1
+            ViewCompat.setScaleY(content, 0f);
+
+            ViewCompat.animate(content)
+                    .scaleY(1f).setDuration(duration)
+                    .setStartDelay(delay);
+        }
+
+        @Override
+        public void animateContentOut(int delay, int duration) {
+            // add custom *out animations for your views
+            // e.g. original snackbar uses alpha animation, from 1 to 0
+            ViewCompat.setScaleY(content, 1f);
+            ViewCompat.animate(content)
+                    .scaleY(0f)
+                    .setDuration(duration)
+                    .setStartDelay(delay);
+        }
     }
 
     public void onSubscribedToPlayerContextButtonClicked(View view) {
@@ -220,8 +238,6 @@ public class PostDetailFragment extends Fragment {
         Toast.makeText(getContext(), msg, duration).show();
         Log.d(TAG, msg);
     }
-
-
     private class TrackProgressBar {
 
         private static final int LOOP_DURATION = 500;
@@ -279,3 +295,4 @@ public class PostDetailFragment extends Fragment {
         }
     }
 }
+

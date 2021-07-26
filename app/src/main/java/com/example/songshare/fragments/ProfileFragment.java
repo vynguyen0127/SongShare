@@ -76,7 +76,7 @@ public class ProfileFragment extends Fragment {
         progress = (ProgressBar) view.findViewById(R.id.progress);
         myPosts = new ArrayList<>();
 
-        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.FEED);
+        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.FEED,ProfileFragment.this);
         rvTopSongs.setAdapter(adapter);
 
         rvTopSongs.setLayoutManager(new LinearLayoutManager(getContext()));

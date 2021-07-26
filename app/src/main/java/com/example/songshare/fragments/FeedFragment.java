@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.songshare.CustomSnackbar;
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.PostsAdapter;
@@ -28,6 +29,7 @@ import com.example.songshare.models.Song;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -40,6 +42,9 @@ public class FeedFragment extends Fragment {
 
 
     public static final String TAG = "FeedFragment";
+    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
+    private static final String REDIRECT_URI = "http://localhost:8888/";
+
     private RecyclerView rvPosts;
     private PostsAdapter adapter;
     private List<Post> allPosts;
@@ -69,19 +74,13 @@ public class FeedFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        adapter.connectRemote();
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         rvPosts = view.findViewById(R.id.rvPosts);
 
         allPosts = new ArrayList<>();
 
-        adapter = new PostsAdapter(getContext(), allPosts,MainActivity.postMode.FEED);
+        adapter = new PostsAdapter(getContext(), allPosts,MainActivity.postMode.FEED,FeedFragment.this);
 
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -144,7 +143,6 @@ public class FeedFragment extends Fragment {
 
         };
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvPosts);
-
     }
 
 
@@ -183,15 +181,8 @@ public class FeedFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        adapter.disconnectRemote();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        adapter.disconnectRemote();
     }
 
     private void goToFragment(Song song,Fragment fragment){
@@ -215,5 +206,14 @@ public class FeedFragment extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
+    public void showPlayer(SpotifyAppRemote remote){
+        CustomSnackbar customSnackbar = CustomSnackbar.make(getActivity().findViewById(R.id.activity_main), CustomSnackbar.LENGTH_INDEFINITE,remote);
+        customSnackbar.setPlayer();
+        customSnackbar.setAction();
+        customSnackbar.setPlay();
+
+        customSnackbar.show();
+
+    }
 
 }

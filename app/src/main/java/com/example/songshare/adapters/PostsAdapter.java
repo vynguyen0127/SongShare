@@ -1,7 +1,6 @@
 package com.example.songshare.adapters;
 
 import android.content.Context;
-import android.os.Handler;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,13 +27,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
-import com.spotify.android.appremote.api.error.NotLoggedInException;
-import com.spotify.android.appremote.api.error.SpotifyConnectionTerminatedException;
-import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,12 +46,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private MainActivity.postMode mode;
     private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
     private static final String REDIRECT_URI = "http://localhost:8888/";
+    Fragment fragment;
 
-    public PostsAdapter(Context context, List<Post> posts, MainActivity.postMode mode){
+    public PostsAdapter(Context context, List<Post> posts, MainActivity.postMode mode, Fragment fragment){
         this.context = context;
         this.posts = posts;
         this.mode = mode;
-        connectRemote();
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -90,54 +85,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void connectRemote(){
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
-
-        SpotifyAppRemote.connect(context, connectionParams,
-                new Connector.ConnectionListener() {
-
-                    @Override
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        remote = spotifyAppRemote;
-                        Log.d(TAG, "Connected! Yay!");
-
-                        // Now you can start interacting with App Remote
-
-                    }
-
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        Log.e(TAG, throwable.getMessage(), throwable);
-                        // Something went wrong when attempting to connect! Handle errors here
-
-                        // Occurs when Spotify app not downloaded
-                        if(throwable instanceof CouldNotFindSpotifyApp){
-                            Toast.makeText(context,"WARNING: Spotify App not downloaded, please download the app and try again.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when User is not logged in to Spotify App
-                        else if(throwable instanceof NotLoggedInException){
-                            Toast.makeText(context,"WARNING: User is not logged into Spotify App.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when User does not give app permission to access Spotify Account
-                        else if(throwable instanceof UserNotAuthorizedException){
-                            Toast.makeText(context,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when app cannot connect to Spotify app
-                        else if(throwable instanceof SpotifyConnectionTerminatedException){
-                            Toast.makeText(context,"WARNING: Connection to Spotify app has been terminated. Please restart the app and try again.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-
-    public void disconnectRemote(){
-        Log.i(TAG,"disconnecting remote");
-        SpotifyAppRemote.disconnect(remote);
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -218,26 +165,29 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(remote == null){
+                    if(((MainActivity)context).remote == null){
                         Toast.makeText(context, "Unable to connect to Spotify App",Toast.LENGTH_LONG).show();
                         return;
                     }
-                    remote.getPlayerApi().play(post.getSongUri());
+                    ((MainActivity)context).remote.getPlayerApi().play(post.getSongUri());
+
+//                    ((FeedFragment)fragment).showPlayer(remote);
+                    ((MainActivity)context).showPlayer();
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle() + " by " + post.getArtist(), Toast.LENGTH_LONG).show();
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            // change image
-
-                            remote.getPlayerApi().pause();
-                        }
-
-                    }, 15000);
+//                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            // change image
+//
+//                            remote.getPlayerApi().pause();
+//                        }
+//
+//                    }, 15000);
 
                 }
             });
@@ -318,4 +268,5 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
     }
+
 }
