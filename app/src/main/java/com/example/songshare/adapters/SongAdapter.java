@@ -25,13 +25,7 @@ import com.example.songshare.fragments.PostDraftFragment;
 import com.example.songshare.fragments.ResultFragment;
 import com.example.songshare.fragments.SearchFragment;
 import com.example.songshare.models.Song;
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp;
-import com.spotify.android.appremote.api.error.NotLoggedInException;
-import com.spotify.android.appremote.api.error.SpotifyConnectionTerminatedException;
-import com.spotify.android.appremote.api.error.UserNotAuthorizedException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,75 +51,20 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.songs = songs;
         this.songMode = songMode;
         this.fragment = fragment;
-
-        connectRemote();
-
     }
+
     public SongAdapter(Context context, List<Song> songs, MainActivity.songMode songMode){
         this.context = context;
         this.songs = songs;
         this.songMode = songMode;
-
-        connectRemote();
-
     }
 
     public void setToken(String token){
         this.token = token;
-
     }
 
     public void setUri(String uri){
         this.uri = uri;
-    }
-
-    public void connectRemote(){
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
-                        .setRedirectUri(REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
-
-        SpotifyAppRemote.connect(context, connectionParams,
-                new Connector.ConnectionListener() {
-
-                    @Override
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        remote = spotifyAppRemote;
-                        Log.d(TAG, "Connected! Yay!");
-
-                        // Now you can start interacting with App Remote
-
-                    }
-
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        Log.e(TAG, throwable.getMessage(), throwable);
-                        // Something went wrong when attempting to connect! Handle errors here
-
-                        // Occurs when Spotify app not downloaded
-                        if(throwable instanceof CouldNotFindSpotifyApp){
-                            Toast.makeText(context,"WARNING: Spotify App not downloaded, please download the app and try again.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when User is not logged in to Spotify App
-                        else if(throwable instanceof NotLoggedInException){
-                            Toast.makeText(context,"WARNING: User is not logged into Spotify App.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when User does not give app permission to access Spotify Account
-                        else if(throwable instanceof UserNotAuthorizedException){
-                            Toast.makeText(context,"WARNING: Spotify User has not authorized permission.",Toast.LENGTH_LONG).show();
-                        }
-                        // Occurs when app cannot connect to Spotify app
-                        else if(throwable instanceof SpotifyConnectionTerminatedException){
-                            Toast.makeText(context,"WARNING: Connection to Spotify app has been terminated. Please restart the app and try again.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-
-    public void disconnectRemote(){
-        Log.i(TAG,"disconnecting remote");
-        SpotifyAppRemote.disconnect(remote);
     }
 
     @NonNull
@@ -205,8 +144,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    remote.getPlayerApi().play(song.getSongUri());
-                    remote.getPlayerApi().seekToRelativePosition(35000);
+                    ((MainActivity)context).remote.getPlayerApi().play(song.getSongUri());
+                    ((MainActivity)context).remote.getPlayerApi().seekToRelativePosition(35000);
 
                     Log.i(TAG, "Play clicked!");
 
@@ -219,7 +158,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                         @Override
                         public void run() {
                             // change image
-                            remote.getPlayerApi().pause();
+                            ((MainActivity)context).remote.getPlayerApi().pause();
                         }
 
                     }, 15000);
@@ -242,11 +181,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 else if(fragment instanceof ResultFragment){
                     ((ResultFragment)fragment).goToFragment(song, new PostDraftFragment());
                 }
-                else {
-//                    Intent i = new Intent(context, PostDraftActivity.class);
-//                    i.putExtra("Song", Parcels.wrap(song));
-//                    context.startActivity(i);
-                }
             }
 
 
@@ -262,12 +196,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
                 else if(fragment instanceof ResultFragment){
                     ((ResultFragment)fragment).goToFragment(song, new PlaylistAddFragment());
-                }
-                else {
-//                    Intent i = new Intent(context, PlaylistAddActivity.class);
-//                    i.putExtra("Song", Parcels.wrap(songs.get(position)));
-//                    i.putExtra("Token", token);
-//                    context.startActivity(i);
                 }
 
             }

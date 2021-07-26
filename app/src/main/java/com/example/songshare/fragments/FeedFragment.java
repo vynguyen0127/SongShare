@@ -80,7 +80,7 @@ public class FeedFragment extends Fragment {
 
         allPosts = new ArrayList<>();
 
-        adapter = new PostsAdapter(getContext(), allPosts,MainActivity.postMode.FEED,FeedFragment.this);
+        adapter = new PostsAdapter(getContext(), allPosts,MainActivity.postMode.FEED);
 
         rvPosts.setAdapter(adapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,7 +26,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,17 +40,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private Context context;
     private List<Post> posts;
-    private SpotifyAppRemote remote;
     private MainActivity.postMode mode;
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String REDIRECT_URI = "http://localhost:8888/";
-    Fragment fragment;
 
-    public PostsAdapter(Context context, List<Post> posts, MainActivity.postMode mode, Fragment fragment){
+
+    public PostsAdapter(Context context, List<Post> posts, MainActivity.postMode mode){
         this.context = context;
         this.posts = posts;
         this.mode = mode;
-        this.fragment = fragment;
     }
 
     @NonNull
