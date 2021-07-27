@@ -17,6 +17,9 @@
     <!-- Errors -->
     <string name="err_spotify_disconnected">"Spotify is not Connected. Use one of the 'connect' buttons"</string>
     <string name="err_generic_toast">An error has occurred. Check the logs to know more.</string>
+    <string name="popup_recommend_desc">Choose 5 songs and 5 artists to add to your seed, then get new recommendations instantly!</string>
+    <string name="tap_to_dismiss">Tap to dismiss</string>
+    <string name="get_new_songs_now">Get new songs now!</string>
 
 
 </resources>

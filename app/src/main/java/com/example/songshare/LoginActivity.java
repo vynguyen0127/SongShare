@@ -24,6 +24,10 @@ public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
     Button btnSignUp;
     String uri;
+    String display_name;
+    String profile_url;
+    String id;
+    String access_token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,12 @@ public class LoginActivity extends AppCompatActivity {
             Log.i(TAG,"Logging in previous user");
             goMainActivity();
         }
+
         uri = getIntent().getStringExtra("uri");
+        display_name = getIntent().getStringExtra("display_name");
+        profile_url = getIntent().getStringExtra("profile_url");
+        id = getIntent().getStringExtra("id");
+
         Log.i(TAG,"uri: " + uri);
 
         etUsername = findViewById(R.id.etUsername);
@@ -57,11 +66,26 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+                Log.i(TAG,"sending uri to signup: " + uri);
+                i.putExtra("uri",uri);
+                i.putExtra("display_name",display_name);
+                i.putExtra("profile_url",profile_url);
+                i.putExtra("id",id);
+                i.putExtra("token",access_token);
                 startActivity(i);
                 finish();
             }
         });
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i(TAG,"onRestart");
+        Intent i = new Intent(LoginActivity.this, SplashActivity.class);
+        startActivity(i);
+    }
+
     private void loginUser(String username, String password) {
         Log.i(TAG,"Attempting to log in user: " + username);
         // navigate to main activity if user has signed in properly
@@ -86,6 +110,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void goMainActivity(){
         Intent i = new Intent(this, MainActivity.class);
+        i.putExtra("token",access_token);
+        i.putExtra("uri",uri);
         startActivity(i);
         finish();
     }

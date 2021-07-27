@@ -39,6 +39,7 @@ public class SplashActivity extends AppCompatActivity {
     String uri;
     String id;
     String profile_url;
+    String display_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,7 @@ public class SplashActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(responseData);
                     uri = json.getString("uri");
                     id = json.getString("id");
+                    display_name = json.getString("display_name");
 
                     JSONArray images = new JSONArray(json.getJSONArray("images").toString());
                     JSONObject imgObject = new JSONObject(images.get(0).toString());
@@ -126,32 +128,39 @@ public class SplashActivity extends AppCompatActivity {
 
                 if((ParseUser.getCurrentUser() != null) ){
                     if(Objects.equals(uri, ParseUser.getCurrentUser().get("spotify_uri").toString())) {
-                        Log.i(TAG, "go to main activity");
-                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                        i.putExtra("uri",uri);
-                        i.putExtra("token",accessToken);
-                        startActivity(i);
-                        finish();
+                        goToMain();
                     }else{
                         ParseUser.logOut();
-                        Log.i(TAG,"go to log in page1");
-                        Intent i = new Intent(SplashActivity.this,LoginActivity.class);
-                        i.putExtra("uri",uri);
-                        startActivity(i);
-                        finish();
+                        goToLogin();
                     }
 
                 }else{
-                    Log.i(TAG,"go to log in page2");
-                    Log.i(TAG,"sending uri: " + uri);
-                    Intent i = new Intent(SplashActivity.this,LoginActivity.class);
-                    i.putExtra("uri",uri);
-                    startActivity(i);
-                    finish();
-
+                    goToLogin();
                 }
             }
 
         });
+    }
+
+    private void goToMain() {
+        Log.i(TAG, "go to main activity");
+        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+        i.putExtra("uri",uri);
+        i.putExtra("token",accessToken);
+        startActivity(i);
+        finish();
+    }
+
+    private void goToLogin() {
+        Log.i(TAG,"go to log in page2");
+        Log.i(TAG,"sending uri: " + uri);
+        Intent i = new Intent(SplashActivity.this,LoginActivity.class);
+        i.putExtra("uri",uri);
+        i.putExtra("display_name",display_name);
+        i.putExtra("profile_url",profile_url);
+        i.putExtra("id",id);
+        i.putExtra("token",accessToken);
+        startActivity(i);
+        finish();
     }
 }

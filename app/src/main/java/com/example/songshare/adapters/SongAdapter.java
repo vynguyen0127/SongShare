@@ -145,7 +145,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     ((MainActivity)context).remote.getPlayerApi().play(song.getSongUri());
-                    ((MainActivity)context).remote.getPlayerApi().seekToRelativePosition(35000);
+                    ((MainActivity)context).showPlayer();
 
                     Log.i(TAG, "Play clicked!");
 

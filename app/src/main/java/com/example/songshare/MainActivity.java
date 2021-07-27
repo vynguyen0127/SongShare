@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void logOutUser(){
         ParseUser.logOut();
-        Intent i = new Intent(MainActivity.this,LoginActivity.class);
+        Intent i = new Intent(MainActivity.this,SplashActivity.class);
         startActivity(i);
         finish();
     }
