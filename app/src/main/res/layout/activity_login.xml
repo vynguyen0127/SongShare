@@ -14,13 +14,11 @@
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/etPassword"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:ems="10"
-        android:hint="Username"
+        android:hint="@string/username"
+        android:importantForAutofill="no"
         android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="285dp" />
@@ -29,42 +27,30 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etUsername"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="3dp"
-        android:layout_marginTop="0dp"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="textPassword"
         tools:layout_editor_absoluteX="14dp"
-        tools:layout_editor_absoluteY="361dp" />
+        tools:layout_editor_absoluteY="361dp"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etPassword"
-        android:layout_alignStart="@id/etPassword"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentBottom="false"
         android:layout_marginStart="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="0dp"
         android:backgroundTint="@color/blue"
-        android:text="Log In" />
+        android:text="@string/log_in" />
 
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="0dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="0dp"
         android:backgroundTint="@color/green"
-        android:text="Sign up" />
+        android:text="@string/sign_up" />
 
 
 

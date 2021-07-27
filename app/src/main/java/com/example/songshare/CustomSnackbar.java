@@ -20,7 +20,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.ErrorCallback;
 import com.spotify.protocol.client.Subscription;
-import com.spotify.protocol.types.PlayerContext;
 import com.spotify.protocol.types.PlayerState;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,20 +27,19 @@ import org.jetbrains.annotations.NotNull;
 public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
     public static final String TAG = "CustomSnackBar";
 
-    private static SpotifyAppRemote mSpotifyAppRemote;
+    private static SpotifyAppRemote remote;
 
-    static AppCompatSeekBar  mSeekBar;
-    static TrackProgressBar mTrackProgressBar;
-    static ImageButton mPlayPauseButton;
+    static AppCompatSeekBar seekBar;
+    static TrackProgressBar trackProgressBar;
+    static ImageButton playPauseButton;
     static TextView tvPlayerSong;
     static TextView tvPlayerArtist;
 
-    Subscription<PlayerState> mPlayerStateSubscription;
-    Subscription<PlayerContext> mPlayerContextSubscription;
+    Subscription<PlayerState> playerStateSubscription;
 
-    private final ErrorCallback mErrorCallback = this::logError;
+    private final ErrorCallback errorCallback = this::logError;
 
-    private Subscription.EventCallback<PlayerState> mPlayerStateEventCallback;
+    private Subscription.EventCallback<PlayerState> playerStateEventCallback;
     static View content;
 
     protected CustomSnackbar(@NonNull @NotNull ViewGroup parent, @NonNull @NotNull View content, @NonNull @NotNull com.google.android.material.snackbar.ContentViewCallback contentViewCallback) {
@@ -50,17 +48,20 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
     public static CustomSnackbar make(ViewGroup parent, @Duration int duration,SpotifyAppRemote remote){
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         content = inflater.inflate(R.layout.custom_snackbar,parent,false);
-        mSpotifyAppRemote = remote;
+        CustomSnackbar.remote = remote;
+
         // create snackbar with custom view
         ContentViewCallback callback= new ContentViewCallback(content);
         CustomSnackbar customSnackbar = new CustomSnackbar(parent, content, callback);
         tvPlayerSong = content.findViewById(R.id.tvPlayerSong);
         tvPlayerArtist = content.findViewById(R.id.tvPlayerArtist);
+
         // Remove black background padding on left and right
         customSnackbar.getView().setPadding(0, 0, 0, 0);
 
         // set snackbar duration
         customSnackbar.setDuration(duration);
+
         return customSnackbar;
     }
 
@@ -72,78 +73,75 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                 dismiss();
             }
         });
-        return this;
-    }
 
-    public CustomSnackbar setPlay() {
         ImageButton actionView = (ImageButton) getView().findViewById(R.id.play);
         actionView.setVisibility(View.VISIBLE);
         actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mSpotifyAppRemote
+                remote
                         .getPlayerApi()
                         .getPlayerState()
                         .setResultCallback(
                                 playerState -> {
                                     if (playerState.isPaused) {
-                                        mSpotifyAppRemote
+                                        remote
                                                 .getPlayerApi()
                                                 .resume();
                                     } else {
-                                        mSpotifyAppRemote
+                                        remote
                                                 .getPlayerApi()
                                                 .pause();
                                     }
                                 });
             }
         });
+
         return this;
     }
 
     public void setPlayer(){
-        mSeekBar = getView().findViewById(R.id.seek_to);
-        mSeekBar.setEnabled(false);
-        mSeekBar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        mSeekBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        mPlayPauseButton = getView().findViewById(R.id.play);
+        seekBar = getView().findViewById(R.id.seek_to);
+        seekBar.setEnabled(false);
+        seekBar.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        seekBar.getIndeterminateDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        playPauseButton = getView().findViewById(R.id.play);
 
-        mTrackProgressBar = new TrackProgressBar(mSeekBar);
+        trackProgressBar = new TrackProgressBar(seekBar);
 
-        mPlayerStateEventCallback =
+        playerStateEventCallback =
                 new Subscription.EventCallback<PlayerState>() {
                     @Override
                     public void onEvent(PlayerState playerState) {
 
                         // Update progressbar
                         if (playerState.playbackSpeed > 0) {
-                            mTrackProgressBar.unpause();
+                            trackProgressBar.unpause();
                         } else {
-                            mTrackProgressBar.pause();
+                            trackProgressBar.pause();
                         }
 
                         // Invalidate play / pause
                         if (playerState.isPaused) {
-                            mPlayPauseButton.setImageResource(R.drawable.btn_play);
+                            playPauseButton.setImageResource(R.drawable.btn_play);
                         } else {
-                            mPlayPauseButton.setImageResource(R.drawable.btn_pause);
+                            playPauseButton.setImageResource(R.drawable.btn_pause);
                         }
 
                         if (playerState.track != null) {
                             // Invalidate seekbar length and position
-                            mSeekBar.setMax((int) playerState.track.duration);
-                            mTrackProgressBar.setDuration(playerState.track.duration);
-                            mTrackProgressBar.update(playerState.playbackPosition);
+                            seekBar.setMax((int) playerState.track.duration);
+                            trackProgressBar.setDuration(playerState.track.duration);
+                            trackProgressBar.update(playerState.playbackPosition);
                             tvPlayerArtist.setText(playerState.track.artist.name);
                             tvPlayerSong.setText(playerState.track.name);
                         }
 
-                        mSeekBar.setEnabled(true);
+                        seekBar.setEnabled(true);
                     }
                 };
 
         onSubscribedToPlayerStateButtonClicked(null);
-        onSubscribedToPlayerContextButtonClicked(null);
     }
 
 
@@ -180,37 +178,19 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         }
     }
 
-    public void onSubscribedToPlayerContextButtonClicked(View view) {
-        if (mPlayerContextSubscription != null && !mPlayerContextSubscription.isCanceled()) {
-            mPlayerContextSubscription.cancel();
-            mPlayerContextSubscription = null;
-        }
-
-
-        mPlayerContextSubscription =
-                (Subscription<PlayerContext>)
-                        mSpotifyAppRemote
-                                .getPlayerApi()
-                                .subscribeToPlayerContext()
-                                .setErrorCallback(
-                                        throwable -> {
-                                            logError(throwable);
-                                        });
-    }
-
     public void onSubscribedToPlayerStateButtonClicked(View view) {
 
-        if (mPlayerStateSubscription != null && !mPlayerStateSubscription.isCanceled()) {
-            mPlayerStateSubscription.cancel();
-            mPlayerStateSubscription = null;
+        if (playerStateSubscription != null && !playerStateSubscription.isCanceled()) {
+            playerStateSubscription.cancel();
+            playerStateSubscription = null;
         }
 
-        mPlayerStateSubscription =
+        playerStateSubscription =
                 (Subscription<PlayerState>)
-                        mSpotifyAppRemote
+                        remote
                                 .getPlayerApi()
                                 .subscribeToPlayerState()
-                                .setEventCallback(mPlayerStateEventCallback)
+                                .setEventCallback(playerStateEventCallback)
                                 .setErrorCallback(
                                         throwable -> {
                                             logError(throwable);
@@ -222,21 +202,13 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         Log.e(TAG, "", throwable);
     }
 
-    private void logMessage(String msg) {
-        logMessage(msg, Toast.LENGTH_SHORT);
-    }
-
-    private void logMessage(String msg, int duration) {
-        Toast.makeText(getContext(), msg, duration).show();
-        Log.d(TAG, msg);
-    }
     private class TrackProgressBar {
 
         private static final int LOOP_DURATION = 500;
-        private final SeekBar mSeekBar;
-        private final Handler mHandler;
+        private final SeekBar seekBar;
+        private final Handler handler;
 
-        private final SeekBar.OnSeekBarChangeListener mSeekBarChangeListener =
+        private final SeekBar.OnSeekBarChangeListener seekBarChangeListener =
                 new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
@@ -246,44 +218,44 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        mSpotifyAppRemote
+                        remote
                                 .getPlayerApi()
                                 .seekTo(seekBar.getProgress())
-                                .setErrorCallback(mErrorCallback);
+                                .setErrorCallback(errorCallback);
                     }
                 };
 
-        private final Runnable mSeekRunnable =
+        private final Runnable runnable =
                 new Runnable() {
                     @Override
                     public void run() {
-                        int progress = mSeekBar.getProgress();
-                        mSeekBar.setProgress(progress + LOOP_DURATION);
-                        mHandler.postDelayed(mSeekRunnable, LOOP_DURATION);
+                        int progress = seekBar.getProgress();
+                        seekBar.setProgress(progress + LOOP_DURATION);
+                        handler.postDelayed(runnable, LOOP_DURATION);
                     }
                 };
 
         private TrackProgressBar(SeekBar seekBar) {
-            mSeekBar = seekBar;
-            mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
-            mHandler = new Handler();
+            this.seekBar = seekBar;
+            this.seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+            handler = new Handler();
         }
 
         private void setDuration(long duration) {
-            mSeekBar.setMax((int) duration);
+            seekBar.setMax((int) duration);
         }
 
         private void update(long progress) {
-            mSeekBar.setProgress((int) progress);
+            seekBar.setProgress((int) progress);
         }
 
         private void pause() {
-            mHandler.removeCallbacks(mSeekRunnable);
+            handler.removeCallbacks(runnable);
         }
 
         private void unpause() {
-            mHandler.removeCallbacks(mSeekRunnable);
-            mHandler.postDelayed(mSeekRunnable, LOOP_DURATION);
+            handler.removeCallbacks(runnable);
+            handler.postDelayed(runnable, LOOP_DURATION);
         }
     }
 }

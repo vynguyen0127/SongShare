@@ -38,7 +38,7 @@ public class ProfileFragment extends Fragment {
 
     private String accessToken;
     private RecyclerView rvTopSongs;
-    private TextView tvTitle2;
+    private TextView tvSubtitle;
     private TextView tvUsername;
     private ImageView ivProfile;
     private List<Post> myPosts;
@@ -71,7 +71,7 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.i(TAG,"profile view created");
         rvTopSongs = view.findViewById(R.id.rvTopSongs);
-        tvTitle2 = view.findViewById(R.id.tvTitle2);
+        tvSubtitle = view.findViewById(R.id.tvSubtitle);
         tvUsername = view.findViewById(R.id.tvUsername);
         progress = (ProgressBar) view.findViewById(R.id.progress);
         myPosts = new ArrayList<>();
@@ -82,7 +82,7 @@ public class ProfileFragment extends Fragment {
         rvTopSongs.setLayoutManager(new LinearLayoutManager(getContext()));
 
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
-        tvTitle2.setText("Posts:");
+        tvSubtitle.setText("Posts:");
 
         queryPosts();
     }

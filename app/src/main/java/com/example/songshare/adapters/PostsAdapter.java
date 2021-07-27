@@ -53,11 +53,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int layout;
-        if(mode == MainActivity.postMode.FEED){
-            layout = R.layout.item_post;
-        }else{
-            layout = R.layout.item_post_alt;
-        }
+        layout = R.layout.item_post;
 
         View view = LayoutInflater.from(context).inflate(layout,parent,false);
         return new ViewHolder(view);
@@ -165,23 +161,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     }
                     ((MainActivity)context).remote.getPlayerApi().play(post.getSongUri());
 
-//                    ((FeedFragment)fragment).showPlayer(remote);
                     ((MainActivity)context).showPlayer();
 
                     Log.i(TAG, "Play clicked!");
                     Toast.makeText(context,"Now playing: " + post.getSongTitle() + " by " + post.getArtist(), Toast.LENGTH_LONG).show();
-
-//                    Handler handler = new Handler();
-//                    handler.postDelayed(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            // change image
-//
-//                            remote.getPlayerApi().pause();
-//                        }
-//
-//                    }, 15000);
 
                 }
             });

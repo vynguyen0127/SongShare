@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.songshare.CustomSnackbar;
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.PostsAdapter;
@@ -29,7 +28,6 @@ import com.example.songshare.models.Song;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -42,8 +40,6 @@ public class FeedFragment extends Fragment {
 
 
     public static final String TAG = "FeedFragment";
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String REDIRECT_URI = "http://localhost:8888/";
 
     private RecyclerView rvPosts;
     private PostsAdapter adapter;
@@ -206,14 +202,5 @@ public class FeedFragment extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
-    public void showPlayer(SpotifyAppRemote remote){
-        CustomSnackbar customSnackbar = CustomSnackbar.make(getActivity().findViewById(R.id.activity_main), CustomSnackbar.LENGTH_INDEFINITE,remote);
-        customSnackbar.setPlayer();
-        customSnackbar.setAction();
-        customSnackbar.setPlay();
-
-        customSnackbar.show();
-
-    }
 
 }

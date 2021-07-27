@@ -368,7 +368,6 @@ public class MainActivity extends AppCompatActivity {
         CustomSnackbar customSnackbar = CustomSnackbar.make(findViewById(R.id.activity_main),CustomSnackbar.LENGTH_INDEFINITE,remote);
         customSnackbar.setPlayer();
         customSnackbar.setAction();
-        customSnackbar.setPlay();
         customSnackbar.show();
     }
 }
