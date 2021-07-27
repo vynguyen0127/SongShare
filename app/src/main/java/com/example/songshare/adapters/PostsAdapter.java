@@ -100,13 +100,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             cvPost = itemView.findViewById(R.id.cvPost);
             linLayPost = itemView.findViewById(R.id.linLayPost);
             layoutCap = itemView.findViewById(R.id.layoutCap);
+            tvUsername = itemView.findViewById(R.id.tvUsername);
+            tvCaption = itemView.findViewById(R.id.tvCaption);
+            tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
+            ibLike = itemView.findViewById(R.id.ibLike);
 
-            if(mode == MainActivity.postMode.FEED) {
-                tvUsername = itemView.findViewById(R.id.tvUsername);
-                tvCaption = itemView.findViewById(R.id.tvCaption);
-                tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
-                ibLike = itemView.findViewById(R.id.ibLike);
+            if(mode == MainActivity.postMode.PROFILE){
+                cvPost.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));
+                linLayPost.setBackgroundColor(context.getResources().getColor(R.color.orchid_pink));
             }
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -135,22 +138,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvSongTitle.setText(post.getSongTitle());
             tvArtist.setText(post.getArtist());
 
-            if(mode == MainActivity.postMode.FEED) {
-                tvUsername.setText("@" + post.getUser().getUsername());
-                tvCaption.setText(post.getCaption());
-                tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));
-                ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart));
-                liked = checkUserLiked(post);
 
-                ibLike.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(!liked){
-                            likePost(post);
-                        }
+            tvUsername.setText("@" + post.getUser().getUsername());
+            tvCaption.setText(post.getCaption());
+            tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));
+            ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart));
+            liked = checkUserLiked(post);
+
+            ibLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!liked){
+                        likePost(post);
                     }
-                });
-            }
+                }
+            });
+
 
             ivAlbum.setOnClickListener(new View.OnClickListener() {
                 @Override

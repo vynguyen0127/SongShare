@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment profileFragment;
     Fragment searchFragment;
     Fragment recommendFragment;
+    CustomSnackbar customSnackbar;
     public static BottomNavigationView bottomNavigationView;
     private static final String[] SCOPES = {"streaming", "playlist-read-private" ,"playlist-modify-public" ,"playlist-modify-private","user-read-private"
                         ,"user-library-read","playlist-read-collaborative","user-top-read"};
@@ -142,14 +143,6 @@ public class MainActivity extends AppCompatActivity {
         ((RecommendFragment) recommendFragment).setToken(accessToken);
 
         connectRemote();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.i(TAG,"onRestart");
-        Intent i = new Intent(MainActivity.this, SplashActivity.class);
-        startActivity(i);
     }
 
     @Override
@@ -260,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.menu_main,menu);
+        getMenuInflater().inflate(R.menu.menu_player,menu);
 
         return true;
     }
@@ -268,10 +261,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(item.getItemId() == R.id.logOut){
-            logOutUser();
-        }
-        else if(item.getItemId() == R.id.player){
+        if(item.getItemId() == R.id.player){
             showPlayer();
         }
         return super.onOptionsItemSelected(item);
@@ -334,7 +324,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-
+                        customSnackbar = CustomSnackbar.make(findViewById(R.id.activity_main),CustomSnackbar.LENGTH_INDEFINITE,remote);
+                        customSnackbar.setPlayer();
+                        customSnackbar.setAction();
                         // Now you can start interacting with App Remote
 
                     }
@@ -365,9 +357,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showPlayer(){
-        CustomSnackbar customSnackbar = CustomSnackbar.make(findViewById(R.id.activity_main),CustomSnackbar.LENGTH_INDEFINITE,remote);
-        customSnackbar.setPlayer();
-        customSnackbar.setAction();
         customSnackbar.show();
     }
 }

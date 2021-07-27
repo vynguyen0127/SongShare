@@ -64,7 +64,6 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_feed, container, false);
     }
@@ -123,14 +122,14 @@ public class FeedFragment extends Fragment {
 
                     rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
 
-                    goToFragment(song, new PlaylistAddFragment());
+                    goToFragment(post, song, new PlaylistAddFragment());
 
                 }
                 else {
                     Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
                     rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
 
-                    goToFragment(song, new PostDetailFragment());
+                    goToFragment(post, song, new PostDetailFragment());
 
                 }
 
@@ -181,7 +180,7 @@ public class FeedFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void goToFragment(Song song,Fragment fragment){
+    private void goToFragment(Post post, Song song,Fragment fragment){
         Fragment destFragment =  fragment;
         String backStateName = destFragment.getClass().getName();
 
@@ -195,8 +194,14 @@ public class FeedFragment extends Fragment {
         }
 
         Bundle bundle = new Bundle();
+
+        if(destFragment instanceof PostDetailFragment){
+            bundle.putParcelable("post",post);
+        }
+        else if(destFragment instanceof PlaylistAddFragment){
+            bundle.putParcelable("song", Parcels.wrap(song));
+        }
         bundle.putString("token",accessToken);
-        bundle.putParcelable("song", Parcels.wrap(song));
         destFragment.setArguments(bundle);
 
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();

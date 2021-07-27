@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,9 +21,12 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.ErrorCallback;
 import com.spotify.protocol.client.Subscription;
+import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.PlayerState;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.TimeUnit;
 
 public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
     public static final String TAG = "CustomSnackBar";
@@ -34,6 +38,9 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
     static ImageButton playPauseButton;
     static TextView tvPlayerSong;
     static TextView tvPlayerArtist;
+    static ImageView ivAlbumArt;
+    static TextView tvPos;
+    static TextView tvDuration;
 
     Subscription<PlayerState> playerStateSubscription;
 
@@ -55,6 +62,10 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         CustomSnackbar customSnackbar = new CustomSnackbar(parent, content, callback);
         tvPlayerSong = content.findViewById(R.id.tvPlayerSong);
         tvPlayerArtist = content.findViewById(R.id.tvPlayerArtist);
+        ivAlbumArt = content.findViewById(R.id.ivAlbumArt);
+        tvPos = content.findViewById(R.id.tvPos);
+        tvDuration = content.findViewById(R.id.tvDuration);
+
 
         // Remove black background padding on left and right
         customSnackbar.getView().setPadding(0, 0, 0, 0);
@@ -123,18 +134,38 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
 
                         // Invalidate play / pause
                         if (playerState.isPaused) {
-                            playPauseButton.setImageResource(R.drawable.btn_play);
+                            playPauseButton.setImageResource(R.drawable.ic_play);
                         } else {
-                            playPauseButton.setImageResource(R.drawable.btn_pause);
+                            playPauseButton.setImageResource(R.drawable.ic_pause);
                         }
 
                         if (playerState.track != null) {
+
+                            long minutes = TimeUnit.MILLISECONDS.toMinutes(playerState.track.duration);
+                            long seconds = TimeUnit.MILLISECONDS.toSeconds(playerState.track.duration);
+                            seconds %= 60;
+                            tvDuration.setText("/" + minutes + ":" + seconds);
+
+                            long min2 = TimeUnit.MILLISECONDS.toMinutes(playerState.playbackPosition);
+                            long sec2 = TimeUnit.MILLISECONDS.toSeconds(playerState.playbackPosition);
+                            sec2 %= 60;
+                            tvPos.setText(min2 + ":" + String.format("%02d", sec2));
+
                             // Invalidate seekbar length and position
                             seekBar.setMax((int) playerState.track.duration);
                             trackProgressBar.setDuration(playerState.track.duration);
                             trackProgressBar.update(playerState.playbackPosition);
                             tvPlayerArtist.setText(playerState.track.artist.name);
                             tvPlayerSong.setText(playerState.track.name);
+                            playerState.track.imageUri.toString();
+
+                            remote
+                            .getImagesApi()
+                                    .getImage(playerState.track.imageUri, Image.Dimension.SMALL)
+                                    .setResultCallback(
+                                            bitmap -> {
+                                                ivAlbumArt.setImageBitmap(bitmap);
+                                            });
                         }
 
                         seekBar.setEnabled(true);
@@ -202,7 +233,7 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         Log.e(TAG, "", throwable);
     }
 
-    private class TrackProgressBar {
+    private static class TrackProgressBar {
 
         private static final int LOOP_DURATION = 500;
         private final SeekBar seekBar;
@@ -211,7 +242,10 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         private final SeekBar.OnSeekBarChangeListener seekBarChangeListener =
                 new SeekBar.OnSeekBarChangeListener() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+
+                    }
 
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -220,9 +254,9 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                     public void onStopTrackingTouch(SeekBar seekBar) {
                         remote
                                 .getPlayerApi()
-                                .seekTo(seekBar.getProgress())
-                                .setErrorCallback(errorCallback);
+                                .seekTo(seekBar.getProgress());
                     }
+
                 };
 
         private final Runnable runnable =
@@ -232,6 +266,10 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                         int progress = seekBar.getProgress();
                         seekBar.setProgress(progress + LOOP_DURATION);
                         handler.postDelayed(runnable, LOOP_DURATION);
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes((long)progress);
+                        long seconds = TimeUnit.MILLISECONDS.toSeconds((long)progress) % 60;
+                        Log.i(TAG,"PROGRESS: " + minutes + ":" + String.format("%02d", seconds));
+                        tvPos.setText(minutes + ":" + String.format("%02d", seconds));
                     }
                 };
 

@@ -14,16 +14,16 @@ import java.util.List;
 public class Song {
 
     private String albumUrl;
-    private String artistName;
+    private String artist;
     private String songTitle;
     private String songUri;
     private String songId;
 
     Song(){}
 
-    public Song(String albumUrl, String artistName, String songTitle, String songUri,String songId){
+    public Song(String albumUrl, String artist, String songTitle, String songUri,String songId){
         this.albumUrl = albumUrl;
-        this.artistName = artistName;
+        this.artist = artist;
         this.songTitle = songTitle;
         this.songUri = songUri;
         this.songId = songId;
@@ -38,12 +38,12 @@ public class Song {
 
             JSONArray array3 = new JSONArray(jsonObject.getString("artists"));
             JSONObject json7 = new JSONObject(array3.get(0).toString());
-            artistName = json7.getString("name").toString();
+            artist = json7.getString("name").toString();
 
             songId = jsonObject.get("id").toString();
             songTitle = jsonObject.getString("name").toString();
             songUri = jsonObject.getString("uri").toString();
-            Log.i("Song", "Album: " + albumUrl + ", Artist: " + artistName + ", Song: " + songTitle + ", URI: " + songUri);
+            Log.i("Song", "Album: " + albumUrl + ", Artist: " + artist + ", Song: " + songTitle + ", URI: " + songUri);
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -65,8 +65,8 @@ public class Song {
         return albumUrl;
     }
 
-    public String getArtistName() {
-        return artistName;
+    public String getArtist() {
+        return artist;
     }
 
     public String getSongTitle() {

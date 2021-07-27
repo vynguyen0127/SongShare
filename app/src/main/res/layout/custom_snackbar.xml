@@ -14,57 +14,89 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="35dp">
+
+            <ImageView
+                android:id="@+id/ivAlbumArt"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <ImageButton
+                android:id="@+id/play"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center|center_vertical"
+                android:background="#00FFFFFF"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/btn_play" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/play"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_vertical"
-                android:background="#00FFFFFF"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/btn_play" />
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatSeekBar
                 android:id="@+id/seek_to"
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:progressTint="@android:color/black"
-                android:thumbTint="#E91E63" />
+                android:layout_marginTop="15dp"
+                android:progressBackgroundTint="#FF0000"
+                android:thumbTint="#2196F3" />
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="visible">
+                <TextView
+                    android:id="@+id/tvPos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginStart="200dp"
+                    android:textSize="18sp"
+                    tools:text="2:00" />
+
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    tools:text="/ 3:56" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvPlayerSong"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:ellipsize="end"
                 android:fontFamily="@font/baloo"
+                android:maxLines="1"
                 android:text="Song"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvPlayerArtist"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:fontFamily="@font/baloo"
                 android:text="Artist" />
+
         </LinearLayout>
 
     </LinearLayout>

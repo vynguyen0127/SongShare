@@ -92,7 +92,7 @@ public class PlaylistAddFragment extends Fragment {
         rvPlaylists = view.findViewById(R.id.rvPlaylists);
 
         tvSongTitle.setText(song.getSongTitle());
-        tvArtist.setText(song.getArtistName());
+        tvArtist.setText(song.getArtist());
         Glide.with(getContext())
                 .load(song.getAlbumUrl())
                 .into(ivAlbum);
@@ -187,11 +187,12 @@ public class PlaylistAddFragment extends Fragment {
         Log.i(TAG,"song: " + songUri + ", url: " +  url);
 
         final RequestBody body = RequestBody.create("", null);
-        final Request.Builder formBody = new Request.Builder()
+        final Request.Builder request = new Request.Builder()
                 .url(url)
                 .method("POST",body)
                 .header("Authorization", "Bearer " + accessToken);
-        okHttpClient.newCall(formBody.build()).enqueue(new Callback() {
+
+        okHttpClient.newCall(request.build()).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Log.i(TAG, "onFailure");
@@ -206,7 +207,6 @@ public class PlaylistAddFragment extends Fragment {
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.popBackStackImmediate();
-
     }
 
 }

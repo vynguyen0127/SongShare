@@ -73,7 +73,7 @@ public class PostDraftFragment extends Fragment {
                 .into(ivAlbum);
 
         tvSongTitle.setText(song.getSongTitle());
-        tvArtist.setText(song.getArtistName());
+        tvArtist.setText(song.getArtist());
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +90,7 @@ public class PostDraftFragment extends Fragment {
         post.setCaption(etCaption.getText().toString());
         post.setUser(currentUser);
         post.setSongTitle(song.getSongTitle());
-        post.setArtist(song.getArtistName());
+        post.setArtist(song.getArtist());
         post.setAlbumUrl(song.getAlbumUrl());
         post.setSongId(song.getSongUri());
         post.setUsersLiked(new JSONArray());

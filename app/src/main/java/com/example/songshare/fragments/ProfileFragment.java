@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,6 +65,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
@@ -76,7 +80,7 @@ public class ProfileFragment extends Fragment {
         progress = (ProgressBar) view.findViewById(R.id.progress);
         myPosts = new ArrayList<>();
 
-        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.FEED);
+        adapter = new PostsAdapter(getContext(),myPosts, MainActivity.postMode.PROFILE);
         rvTopSongs.setAdapter(adapter);
 
         rvTopSongs.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -85,6 +89,22 @@ public class ProfileFragment extends Fragment {
         tvSubtitle.setText("Posts:");
 
         queryPosts();
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull @NotNull Menu menu, @NonNull @NotNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_logout, menu);
+        final MenuItem logoutItem = menu.findItem(R.id.logout);
+        logoutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ((MainActivity)getActivity()).logOutUser();
+                return true;
+            }
+        });
     }
 
     public void setToken(String token){

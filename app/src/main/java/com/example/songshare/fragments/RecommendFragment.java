@@ -266,7 +266,6 @@ public class RecommendFragment extends Fragment {
         artistManager.setCanScrollVertical(true);
         artistManager.setSwipeableMethod(SwipeableMethod.AutomaticAndManual);
 
-
         csArtists.setLayoutManager(artistManager);
         csArtists.setAdapter(artistAdapter);
     }

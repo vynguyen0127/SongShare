@@ -270,6 +270,7 @@ public class SearchFragment extends Fragment {
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("song", Parcels.wrap(song));
+        bundle.putString("token",accessToken);
         destFragment.setArguments(bundle);
 
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();

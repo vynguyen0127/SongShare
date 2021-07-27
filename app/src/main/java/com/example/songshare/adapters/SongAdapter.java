@@ -138,7 +138,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     .into(ivAlbum);
 
             tvSongTitle.setText(song.getSongTitle());
-            tvArtist.setText(song.getArtistName());
+            tvArtist.setText(song.getArtist());
 
 
             ivAlbum.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +150,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     Log.i(TAG, "Play clicked!");
 
                     Toast.makeText(context,"Now playing: " + song.getSongTitle() + " by "
-                            + song.getArtistName(), Toast.LENGTH_LONG).show();
+                            + song.getArtist(), Toast.LENGTH_LONG).show();
 
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {

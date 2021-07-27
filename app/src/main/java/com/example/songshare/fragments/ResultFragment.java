@@ -190,6 +190,7 @@ public class ResultFragment extends Fragment {
 
         if (!fragmentPopped){ //fragment not in back stack, create it.
             FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.addToBackStack(null);
             ft.replace(R.id.flContainer, destFragment);
             ft.addToBackStack(backStateName);
             ft.commit();
@@ -197,6 +198,7 @@ public class ResultFragment extends Fragment {
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("song", Parcels.wrap(song));
+        bundle.putString("token",accessToken);
         destFragment.setArguments(bundle);
 
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
