@@ -4,10 +4,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.songshare.MainActivity;
 import com.example.songshare.R;
 import com.example.songshare.adapters.PlaylistAdapter;
 import com.example.songshare.models.Playlist;
@@ -38,10 +45,14 @@ import java.util.Objects;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class PlaylistAddFragment extends Fragment {
 
@@ -49,6 +60,7 @@ public class PlaylistAddFragment extends Fragment {
     private TextView tvSongTitle;
     private TextView tvArtist;
     private ImageView ivAlbum;
+    private Button btnCreate;
     private RecyclerView rvPlaylists;
     private List<Playlist> playlists;
     private PlaylistAdapter adapter;
@@ -89,6 +101,7 @@ public class PlaylistAddFragment extends Fragment {
         tvSongTitle = view.findViewById(R.id.tvTitle);
         tvArtist = view.findViewById(R.id.tvArtist);
         ivAlbum = view.findViewById(R.id.ivCover);
+        btnCreate = view.findViewById(R.id.btnCreate);
         rvPlaylists = view.findViewById(R.id.rvPlaylists);
 
         tvSongTitle.setText(song.getSongTitle());
@@ -103,6 +116,12 @@ public class PlaylistAddFragment extends Fragment {
         rvPlaylists.setAdapter(adapter);
         rvPlaylists.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopUpWindow(v);
+            }
+        });
         makeRequest();
     }
 
@@ -176,7 +195,7 @@ public class PlaylistAddFragment extends Fragment {
         });
     }
 
-    public void addSong(String playlistId){
+    public void addSong(String playlistId, boolean b){
 
         String songUri = song.getSongUri();
 
@@ -204,9 +223,93 @@ public class PlaylistAddFragment extends Fragment {
 
             }
         });
+        if(b) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            fragmentManager.popBackStackImmediate();
+        }
+    }
 
+    private void createPlaylist(String name, String description, String playlistPublic){
+
+        String id = ((MainActivity) getActivity()).getUserId();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/users/%s/playlists",id)).newBuilder();
+        String url = urlBuilder.build().toString();
+
+        Log.i(TAG,"id: " + id + ", url: " +  url);
+        String json = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"public\":\"%s\"}",name,description,playlistPublic);
+
+        RequestBody body1 = RequestBody.create(json, MediaType.parse("application/json"));
+
+        final Request.Builder request = new Request.Builder()
+                .url(url)
+                .method("POST",body1)
+                .header("Authorization", "Bearer " + accessToken);
+
+
+        okHttpClient.newCall(request.build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.i(TAG, "onFailure");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                ResponseBody responseBody = response.body();
+                String data = responseBody.string();
+                try {
+                    JSONObject json = new JSONObject(data);
+                    String playlistId = json.getString("id");
+                    addSong(playlistId,false);
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.popBackStackImmediate();
+    }
+
+    private void showPopUpWindow(View view) {
+
+        EditText etPlaylist;
+        EditText etPlaylistDesc;
+        Switch switchPublic;
+        Button btnAdd;
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                ((MainActivity)this.getActivity()).getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_make_playlist, null);
+
+        etPlaylist = popupView.findViewById(R.id.etPlaylist);
+        etPlaylistDesc = popupView.findViewById(R.id.etPlaylistDesc);
+        switchPublic = popupView.findViewById(R.id.switchPublic);
+        btnAdd = popupView.findViewById(R.id.btnAdd);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow.setAnimationStyle(R.style.popup_window_animation_phone);
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = etPlaylist.getText().toString();
+                String desc = etPlaylistDesc.getText().toString();
+                String playlistPublic = switchPublic.isChecked() ? "true" : "false";
+
+                createPlaylist(name,desc, playlistPublic);
+                popupWindow.dismiss();
+            }
+        });
+
+
     }
 
 }

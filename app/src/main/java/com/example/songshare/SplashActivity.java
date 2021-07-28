@@ -147,6 +147,7 @@ public class SplashActivity extends AppCompatActivity {
         Intent i = new Intent(SplashActivity.this, MainActivity.class);
         i.putExtra("uri",uri);
         i.putExtra("token",accessToken);
+        i.putExtra("id",id);
         startActivity(i);
         finish();
     }

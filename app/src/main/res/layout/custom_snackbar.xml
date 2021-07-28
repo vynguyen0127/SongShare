@@ -23,7 +23,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginBottom="35dp">
+            android:layout_marginBottom="30dp">
 
             <ImageView
                 android:id="@+id/ivAlbumArt"
@@ -46,41 +46,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatSeekBar
-                android:id="@+id/seek_to"
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:layout_marginTop="15dp"
-                android:progressBackgroundTint="#FF0000"
-                android:thumbTint="#2196F3" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvPos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:layout_marginStart="200dp"
-                    android:textSize="18sp"
-                    tools:text="2:00" />
-
-                <TextView
-                    android:id="@+id/tvDuration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    tools:text="/ 3:56" />
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/tvPlayerSong"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/baloo"
@@ -93,9 +64,37 @@
                 android:id="@+id/tvPlayerArtist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:fontFamily="@font/baloo"
                 android:text="Artist" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seek_to"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:progressBackgroundTint="@color/white"
+                android:thumbTint="#2196F3" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:textSize="18sp"
+                    tools:text="2:00" />
+
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    tools:text="/ 3:56" />
+            </LinearLayout>
 
         </LinearLayout>
 

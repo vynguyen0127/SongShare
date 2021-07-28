@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1337;
     private String accessToken;
     private String currentUserUri;
+    String userId;
     View mView;
 
     public enum songMode {
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         currentUserUri = getIntent().getStringExtra("uri");
         accessToken = getIntent().getStringExtra("token");
+        userId = getIntent().getStringExtra("id");
         Log.i(TAG,"TOKEN: " + accessToken);
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
@@ -359,4 +361,6 @@ public class MainActivity extends AppCompatActivity {
     public void showPlayer(){
         customSnackbar.show();
     }
+
+    public String getUserId(){return userId;}
 }

@@ -95,7 +95,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         public void onClick(View v) {
             Playlist item = playlists.get(getAdapterPosition());
 
-            ((PlaylistAddFragment)fragment).addSong(item.getPlaylistId());
+            ((PlaylistAddFragment)fragment).addSong(item.getPlaylistId(),true);
 
 
         }
