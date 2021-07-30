@@ -362,5 +362,13 @@ public class MainActivity extends AppCompatActivity {
         customSnackbar.show();
     }
 
+    public void showMsg(String msg){
+        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_SHORT).show();
+    }
+
     public String getUserId(){return userId;}
+
+    public void adapterNotify(){
+        ((FeedFragment)feedFragment).notifyFromOutside();
+    }
 }

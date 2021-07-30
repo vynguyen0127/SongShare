@@ -23,8 +23,11 @@ import com.example.songshare.R;
 import com.example.songshare.models.Post;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class PostDetailFragment extends Fragment {
 
@@ -80,15 +83,30 @@ public class PostDetailFragment extends Fragment {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_post_detail, menu);
         final MenuItem deleteItem = menu.findItem(R.id.delete);
-        deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                deletePost();
-                // return to feed fragment
-                navigateHome();
-                return true;
-            }
-        });
+
+        final MenuItem captionItem = menu.findItem(R.id.caption);
+        if(!Objects.equals(post.getUser().getUsername(),ParseUser.getCurrentUser().getUsername())){
+            captionItem.setVisible(false);
+            deleteItem.setVisible(false);
+        }
+        else{
+            deleteItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    deletePost();
+                    return true;
+                }
+            });
+
+            captionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    return false;
+                }
+            });
+
+        }
+
     }
 
 
@@ -103,6 +121,7 @@ public class PostDetailFragment extends Fragment {
                 object.deleteInBackground(e2 -> {
                     if(e2==null){
                         Log.i(TAG,"Delete successful");
+                        navigateHome();
                     }else{
                         //Something went wrong while deleting the Object
                         Log.i(TAG,"Error: "+e2.getMessage());

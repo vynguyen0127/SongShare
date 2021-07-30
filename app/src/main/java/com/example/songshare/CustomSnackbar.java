@@ -144,7 +144,7 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                             long minutes = TimeUnit.MILLISECONDS.toMinutes(playerState.track.duration);
                             long seconds = TimeUnit.MILLISECONDS.toSeconds(playerState.track.duration);
                             seconds %= 60;
-                            tvDuration.setText("/" + minutes + ":" + seconds);
+                            tvDuration.setText("/" + minutes + ":" + String.format("%02d", seconds));
 
                             long min2 = TimeUnit.MILLISECONDS.toMinutes(playerState.playbackPosition);
                             long sec2 = TimeUnit.MILLISECONDS.toSeconds(playerState.playbackPosition);
@@ -266,9 +266,8 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
                         int progress = seekBar.getProgress();
                         seekBar.setProgress(progress + LOOP_DURATION);
                         handler.postDelayed(runnable, LOOP_DURATION);
-                        long minutes = TimeUnit.MILLISECONDS.toMinutes((long)progress);
-                        long seconds = TimeUnit.MILLISECONDS.toSeconds((long)progress) % 60;
-                        Log.i(TAG,"PROGRESS: " + minutes + ":" + String.format("%02d", seconds));
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(progress);
+                        long seconds = TimeUnit.MILLISECONDS.toSeconds(progress) % 60;
                         tvPos.setText(minutes + ":" + String.format("%02d", seconds));
                     }
                 };

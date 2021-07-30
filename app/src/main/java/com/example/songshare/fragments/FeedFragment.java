@@ -1,5 +1,8 @@
 package com.example.songshare.fragments;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -49,6 +52,11 @@ public class FeedFragment extends Fragment {
     private SwipeRefreshLayout swipeContainer;
     FragmentManager fragmentManager;
     ItemTouchHelper.SimpleCallback itemTouchHelperCallback;
+    Paint paintLeft;
+    Paint paintRight;
+    Drawable iconPlaylist;
+    Drawable iconInfo;
+
 
     public FeedFragment() {
         // Required empty public constructor
@@ -81,6 +89,12 @@ public class FeedFragment extends Fragment {
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         progress = (ProgressBar) view.findViewById(R.id.progress);
         queryPosts();
+        paintRight = new Paint();
+        paintLeft = new Paint();
+        paintRight.setColor(getActivity().getColor(R.color.green));
+        paintLeft.setColor(getActivity().getColor(R.color.uranian_blue));
+        iconPlaylist = getContext().getDrawable(R.drawable.ic_baseline_playlist_add_24);
+        iconInfo = getContext().getDrawable(R.drawable.ic_baseline_info_24);
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
 
@@ -102,6 +116,8 @@ public class FeedFragment extends Fragment {
                 android.R.color.holo_red_light);
 
         fragmentManager = getActivity().getSupportFragmentManager();
+
+
 
 
         itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -133,6 +149,43 @@ public class FeedFragment extends Fragment {
 
                 }
 
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    // Get RecyclerView item from the ViewHolder
+                    View itemView = viewHolder.itemView;
+
+                    // on swipe right
+                    if (dX > 0) {
+
+                        // Draw Rect with varying right side, equal to displacement dX
+                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                                (float) itemView.getBottom(), paintRight);
+
+                        iconPlaylist.setBounds(itemView.getLeft(),
+                                itemView.getTop(),
+                                itemView.getLeft() + itemView.getHeight(),
+                                itemView.getBottom());
+                        iconPlaylist.draw(c);
+                    }
+                    // on swipe left
+                    else {
+                        // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                                (float) itemView.getRight(), (float) itemView.getBottom(), paintLeft);
+
+
+                        iconInfo.setBounds(itemView.getRight() - 235,
+                                itemView.getTop() + 50,
+                                itemView.getRight() ,
+                                itemView.getBottom() - 50);
+                        iconInfo.draw(c);
+                    }
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
             }
 
 
@@ -207,5 +260,8 @@ public class FeedFragment extends Fragment {
         fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
+    public void notifyFromOutside(){
+        queryPosts();
+    }
 
 }

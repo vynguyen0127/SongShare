@@ -91,7 +91,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         Boolean visible = false;
         LinearLayout layoutCap;
 
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSongTitle = itemView.findViewById(R.id.tvTitle);
@@ -104,6 +103,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvCaption = itemView.findViewById(R.id.tvCaption);
             tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
             ibLike = itemView.findViewById(R.id.ibLike);
+
 
             if(mode == MainActivity.postMode.PROFILE){
                 cvPost.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));

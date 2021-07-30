@@ -196,7 +196,6 @@ public class PlaylistAddFragment extends Fragment {
     }
 
     public void addSong(String playlistId, boolean b){
-
         String songUri = song.getSongUri();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/playlists/%s/tracks",playlistId)).newBuilder();
@@ -221,8 +220,12 @@ public class PlaylistAddFragment extends Fragment {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 Log.i(TAG,response.toString());
 
+                // TODO: Toast saying song added to playlist
+
+
             }
         });
+
         if(b) {
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             fragmentManager.popBackStackImmediate();
@@ -238,11 +241,11 @@ public class PlaylistAddFragment extends Fragment {
         Log.i(TAG,"id: " + id + ", url: " +  url);
         String json = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"public\":\"%s\"}",name,description,playlistPublic);
 
-        RequestBody body1 = RequestBody.create(json, MediaType.parse("application/json"));
+        RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
 
         final Request.Builder request = new Request.Builder()
                 .url(url)
-                .method("POST",body1)
+                .method("POST",body)
                 .header("Authorization", "Bearer " + accessToken);
 
 
@@ -301,6 +304,7 @@ public class PlaylistAddFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String name = etPlaylist.getText().toString();
+                
                 String desc = etPlaylistDesc.getText().toString();
                 String playlistPublic = switchPublic.isChecked() ? "true" : "false";
 

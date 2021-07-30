@@ -40,7 +40,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import okhttp3.Call;
@@ -67,7 +67,7 @@ public class RecommendFragment extends Fragment {
     ArrayList<String> seed_songs;
     ArrayList<String> seed_genres;
 
-    HashMap<String,String> seen_artists;
+    HashSet<String> seen_artists;
 
     FragmentManager fragmentManager;
     String accessToken;
@@ -106,7 +106,7 @@ public class RecommendFragment extends Fragment {
 
         artists = new ArrayList<>();
         artistAdapter = new ArtistAdapter(getContext(), artists);
-        seen_artists = new HashMap<>();
+        seen_artists = new HashSet<>();
 
         addSongs();
         addArtists();
@@ -371,8 +371,8 @@ public class RecommendFragment extends Fragment {
                         JSONArray jsonArtists = new JSONArray(jsonObject.get("artists").toString());
                         for(int i = 0; i < 5; i++){
                             Artist artist = new Artist(jsonArtists.getJSONObject(i));
-                            if(!seen_artists.containsKey(artist.getArtistId())) {
-                                seen_artists.put(artist.getArtistId(),"");
+                            if(!seen_artists.contains(artist.getArtistId())) {
+                                seen_artists.add(artist.getArtistId());
                                 artists.add(artist);
                             }
                         }
@@ -428,10 +428,10 @@ public class RecommendFragment extends Fragment {
         artists.add(new Artist("5 Seconds of Summer","5Rl15oVamLq7FbSb0NNBNy","https://i.scdn.co/image/ab6761610000f178ffe8513647c422e6d93ed94a"));
         artists.add(new Artist("Billie Eilish","6qqNVTkY8uBg9cP3Jd7DAH","https://i.scdn.co/image/ab67616100005174d8b9980db67272cb4d2c3daf"));
 
-        seen_artists.put("6KImCVD70vtIoJWnq6nGn3","");
-        seen_artists.put("1McMsnEElThX1knmY4oliG","");
-        seen_artists.put("5Rl15oVamLq7FbSb0NNBNy","");
-        seen_artists.put("6qqNVTkY8uBg9cP3Jd7DAH","");
+        seen_artists.add("6KImCVD70vtIoJWnq6nGn3");
+        seen_artists.add("1McMsnEElThX1knmY4oliG");
+        seen_artists.add("5Rl15oVamLq7FbSb0NNBNy");
+        seen_artists.add("6qqNVTkY8uBg9cP3Jd7DAH");
 
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(new Runnable() {
