@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardBackgroundColor="#FF9800"
+    card_view:cardCornerRadius="10dp"
+    card_view:cardElevation="20dp">
+
+    <LinearLayout
+        android:layout_width="201dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:background="#FBD69F"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnSortPopular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sort by popularity" />
+
+        <Button
+            android:id="@+id/btnSortDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sort by release date" />
+
+        <EditText
+            android:id="@+id/etDateLower"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="textPersonName"
+            tools:text="YYYY-MM-DD" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TO" />
+
+        <EditText
+            android:id="@+id/etDateUpper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:background="@color/white"
+            android:ems="10"
+            android:inputType="textPersonName"
+            tools:text="YYYY-MM-DD" />
+
+        <Button
+            android:id="@+id/btnRangeSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search songs in this range" />
+
+        <CheckBox
+            android:id="@+id/chkExplicit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Explicit" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView><?xml version="1.0" encoding="utf-8"?>

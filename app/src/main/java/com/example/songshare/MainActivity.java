@@ -56,13 +56,22 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
+    private static final String SPOTIFY_CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
+    private static final String GENIUS_CLIENT_ID = "7vKofpT_Y7XPvfvr0w6ys81GxaFajMoaEBz2-AeK3nKJXpbaDI-GP6RU_4488oCJ";
     private static final String REDIRECT_URI = "http://localhost:8888/";
     private static final int REQUEST_CODE = 1337;
-    private String accessToken;
+    private String accessTokenSpotify;
+    private String accessTokenGenius;
     private String currentUserUri;
     String userId;
     View mView;
+
+    public enum sortMode {
+        POPULARITY,
+        POPULARITY_REVERSE,
+        RELEASE,
+        RELEASE_REVERSE
+    };
 
     public enum songMode {
         SEED,
@@ -97,9 +106,9 @@ public class MainActivity extends AppCompatActivity {
         ParseObject.registerSubclass(Post.class);
 
         currentUserUri = getIntent().getStringExtra("uri");
-        accessToken = getIntent().getStringExtra("token");
+        accessTokenSpotify = getIntent().getStringExtra("token");
         userId = getIntent().getStringExtra("id");
-        Log.i(TAG,"TOKEN: " + accessToken);
+        Log.i(TAG,"TOKEN: " + accessTokenSpotify);
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -140,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
-        ((SearchFragment) searchFragment).setToken(accessToken);
-        ((ProfileFragment) profileFragment).setToken(accessToken);
-        ((RecommendFragment) recommendFragment).setToken(accessToken);
+        ((SearchFragment) searchFragment).setToken(accessTokenSpotify);
+        ((ProfileFragment) profileFragment).setToken(accessTokenSpotify);
+        ((RecommendFragment) recommendFragment).setToken(accessTokenSpotify);
 
         connectRemote();
     }
@@ -156,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(SPOTIFY_CLIENT_ID, AuthorizationResponse.Type.TOKEN,REDIRECT_URI);
         builder.setScopes(SCOPES);
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
@@ -177,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     // Handle successful response
 
                     // Need access token to make calls to Spotify Web API
-                    accessToken = response.getAccessToken();
+                    accessTokenSpotify = response.getAccessToken();
                     getUserUri();
 
                     ((SearchFragment) searchFragment).setToken(response.getAccessToken());
@@ -206,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Request request = new Request.Builder()
                 .url(url)
-                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Authorization", "Bearer " + accessTokenSpotify)
                 .build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
@@ -269,8 +278,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String getAccessToken(){
-        return accessToken;
+    public String getAccessTokenSpotify(){
+        return accessTokenSpotify;
     }
 
     public String getCurrentUserUri(){
@@ -314,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connectRemote(){
         ConnectionParams connectionParams =
-                new ConnectionParams.Builder(CLIENT_ID)
+                new ConnectionParams.Builder(SPOTIFY_CLIENT_ID)
                         .setRedirectUri(REDIRECT_URI)
                         .showAuthView(true)
                         .build();
@@ -362,13 +371,8 @@ public class MainActivity extends AppCompatActivity {
         customSnackbar.show();
     }
 
-    public void showMsg(String msg){
-        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_SHORT).show();
-    }
-
     public String getUserId(){return userId;}
 
-    public void adapterNotify(){
-        ((FeedFragment)feedFragment).notifyFromOutside();
-    }
+
+
 }

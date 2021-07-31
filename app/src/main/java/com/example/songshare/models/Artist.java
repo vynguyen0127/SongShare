@@ -4,14 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
 public class Artist {
 
     String name;
     String artistId;
     String imageUri;
-    List<String> genres;
 
     public Artist(String name, String artistId, String imageUri){
         this.name = name;
@@ -29,6 +26,7 @@ public class Artist {
             imageUri = image.getString("url");
 
         }catch(JSONException e){
+            imageUri = "";
             e.printStackTrace();
         }
     }

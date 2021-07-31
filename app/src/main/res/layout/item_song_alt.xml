@@ -20,6 +20,20 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/tvRelease"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="2015-08-04" />
+
+        <TextView
+            android:id="@+id/tvPop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="45" />
+
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,6 +90,7 @@
                 android:layout_marginBottom="20dp"
                 android:fontFamily="@font/baloo"
                 tools:text="Artist" />
+
         </LinearLayout>
 
     </LinearLayout>

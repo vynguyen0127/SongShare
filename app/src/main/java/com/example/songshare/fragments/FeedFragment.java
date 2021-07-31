@@ -33,6 +33,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -209,7 +210,9 @@ public class FeedFragment extends Fragment {
                 }
 
                 for (Post post : posts) {
-                    Log.i(TAG, "Post: " + post.getCaption() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongTitle());
+                    JSONArray a = post.getUsersLiked();
+                    Log.i(TAG, "Post: " + post.getCaption() + ", Num likes: " + a.length() + ", User: " + post.getUser().getUsername() + ", Song: " + post.getSongTitle());
+
                 }
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
@@ -225,7 +228,7 @@ public class FeedFragment extends Fragment {
         });
     }
     private String fetchToken(){
-        return ((MainActivity)this.getActivity()).getAccessToken();
+        return ((MainActivity)this.getActivity()).getAccessTokenSpotify();
     }
 
     @Override

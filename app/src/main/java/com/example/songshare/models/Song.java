@@ -9,17 +9,25 @@ import org.parceler.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Parcel
-public class Song {
+public class Song implements Comparable<Song> {
 
     private String albumUrl;
     private String artist;
     private String songTitle;
     private String songUri;
     private String songId;
+    private String releaseDate;
+    private int popularity;
+    int year;
+    int month;
+    int day;
+    Date date;
+    Boolean explicit;
 
-    Song(){}
+    public Song(){}
 
     public Song(String albumUrl, String artist, String songTitle, String songUri,String songId){
         this.albumUrl = albumUrl;
@@ -31,19 +39,38 @@ public class Song {
     
     Song(JSONObject jsonObject){
         try {
-            JSONObject json4 = new JSONObject(jsonObject.getString("album"));
-            JSONArray array2 = new JSONArray(json4.getString("images"));
-            JSONObject json5 = new JSONObject(array2.get(0).toString());
-            albumUrl = json5.getString("url").toString();
+            JSONObject jsonAlbum = new JSONObject(jsonObject.getString("album"));
+            String release_date_precision = jsonAlbum.getString("release_date_precision");
+            releaseDate = jsonAlbum.getString("release_date");
+            if(Objects.equals(release_date_precision,"year")){
+                releaseDate += "-01-01";
+            }
+            else if(Objects.equals(release_date_precision,"month")){
+                releaseDate += "-01";
+            }
 
-            JSONArray array3 = new JSONArray(jsonObject.getString("artists"));
-            JSONObject json7 = new JSONObject(array3.get(0).toString());
-            artist = json7.getString("name").toString();
+            date = new Date(releaseDate);
+            year = Integer.parseInt(releaseDate.substring(0, 4));
+            month = Integer.parseInt(releaseDate.substring(5, 7));
+            day = Integer.parseInt(releaseDate.substring(8, 10));
+
+            JSONArray imagesArray = new JSONArray(jsonAlbum.getString("images"));
+            JSONObject jsonImage = new JSONObject(imagesArray.get(0).toString());
+            albumUrl = jsonImage.getString("url").toString();
+
+            JSONArray artistArray = new JSONArray(jsonObject.getString("artists"));
+
+            JSONObject jsonArtist = new JSONObject(artistArray.get(0).toString());
+            artist = jsonArtist.getString("name").toString();
 
             songId = jsonObject.get("id").toString();
             songTitle = jsonObject.getString("name").toString();
             songUri = jsonObject.getString("uri").toString();
-            Log.i("Song", "Album: " + albumUrl + ", Artist: " + artist + ", Song: " + songTitle + ", URI: " + songUri);
+            String ex = jsonObject.getString("explicit");
+            explicit = (Objects.equals(ex, "true"));
+
+            popularity = Integer.parseInt(jsonObject.getString("popularity"));
+            Log.i("Song", "Date: " + releaseDate + ", Popularity: " + popularity + ", Album: " + albumUrl + ", Artist: " + artist + ", Song: " + songTitle + ", URI: " + songUri);
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -78,4 +105,33 @@ public class Song {
     }
 
     public String getSongId() { return songId; }
+
+    public int getPopularity(){ return popularity; }
+
+    public String getReleaseDate() { return releaseDate; }
+
+    public Date getDate(){ return date; }
+
+    public void setDate(Date date){this.date = date;}
+
+    public void setPopularity(int popularity){this.popularity = popularity; }
+
+    public void print(Song song){
+        Log.i("FILTER",
+                "Date: " + song.getReleaseDate() +
+                        ", Popularity: " + song.getPopularity() +
+                        ", Album: " + song.getAlbumUrl() +
+                        ", Artist: " + song.getArtist() +
+                        ", Song: " + song.getSongTitle() +
+                        ", URI: " + song.getSongUri());
+    }
+
+    @Override
+    public int compareTo(Song o) {
+        return 0;
+    }
 }
+
+
+
+

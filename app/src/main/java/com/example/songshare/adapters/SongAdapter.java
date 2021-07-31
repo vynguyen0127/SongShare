@@ -103,6 +103,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         TextView tvArtist;
         CardView cvSong;
         LinearLayout linLaySong;
+        TextView tvPop;
+        TextView tvRelease;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -114,11 +116,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             linLaySong = itemView.findViewById(R.id.linLaySong);
 
 
+
             switch(songMode){
                 case SEED:
                     break;
                 case RECOMMEND:
                 case SEARCH:
+                    tvPop = itemView.findViewById(R.id.tvPop);
+                    tvRelease = itemView.findViewById(R.id.tvRelease);
                     cvSong.setCardBackgroundColor(context.getResources().getColor(R.color.nadeshiko_pink));
                     linLaySong.setBackgroundColor(context.getResources().getColor(R.color.orchid_pink));
                     itemView.setOnLongClickListener(this);
@@ -165,7 +170,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
                 }
             });
-
+            if(songMode == MainActivity.songMode.SEARCH){
+                tvPop.setText(Integer.toString(song.getPopularity()));
+                tvRelease.setText(song.getReleaseDate());
+            }
 
         }
 
