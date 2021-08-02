@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
         POPULARITY,
         POPULARITY_REVERSE,
         RELEASE,
-        RELEASE_REVERSE
+        RELEASE_REVERSE,
+        NONE
     };
 
     public enum songMode {
@@ -127,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.action_home:
                         // do something here
+                        ((SearchFragment)searchFragment).reset();
                         fragment = feedFragment;
                         break;
                     case R.id.action_profile:
                         // do something here
+                        ((SearchFragment)searchFragment).reset();
                         fragment = profileFragment;
                         break;
                     case R.id.action_search:
@@ -138,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                         fragment = searchFragment;
                         break;
                     case R.id.action_recommend:
+                        ((SearchFragment)searchFragment).reset();
                         fragment = recommendFragment;
                         break;
                     default:

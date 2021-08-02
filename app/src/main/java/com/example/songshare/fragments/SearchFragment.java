@@ -58,7 +58,7 @@ public class SearchFragment extends Fragment {
 
     public static final String TAG = "SearchFragment";
     private RecyclerView rvResults;
-    private List<Song> songs;
+    static private List<Song> songs;
     private SongAdapter adapter;
     private ProgressBar progress;
     FragmentManager fragmentManager;
@@ -76,17 +76,19 @@ public class SearchFragment extends Fragment {
     EditText etDateLower;
     EditText etDateUpper;
     LinearLayout layoutFilter;
-    Boolean visible = false;
     CheckBox chkExplicit;
     CheckBox chkClean;
+
     enum Explicit{
         EXPLICIT,
         CLEAN,
         NONE
     }
 
-    Explicit expSearch = Explicit.NONE;
-    Boolean dateSearch = false;
+    Explicit expSearch;
+    MainActivity.sortMode sortMode;
+    Boolean dateSearch;
+    Boolean filterVisible;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -96,7 +98,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -108,39 +109,15 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        Log.i(TAG,"onResume");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.i(TAG,"onStop");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG,"onDestroy");
-
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view,savedInstanceState);
-        if(lastQuery != null){
-            Log.i(TAG,"doing previous search");
-            makeRequest(lastQuery);
-        }
+
         rvResults = view.findViewById(R.id.rvResults);
 
         btnApplyFilters = view.findViewById(R.id.btnRangeSearch);
         etDateLower = view.findViewById(R.id.etDateLower);
         etDateUpper = view.findViewById(R.id.etDateUpper);
         layoutFilter = view.findViewById(R.id.layoutFilter);
-        layoutFilter.setVisibility(View.GONE);
 
         btnClear = view.findViewById(R.id.btnClear);
         btnSortPopular = view.findViewById(R.id.btnSortPopular);
@@ -148,7 +125,35 @@ public class SearchFragment extends Fragment {
         chkExplicit = view.findViewById(R.id.chkExplicit);
         chkClean = view.findViewById(R.id.chkClean);
 
-        songs = new ArrayList<>();
+        layoutFilter.setVisibility(View.GONE);
+
+        if(songs == null) {
+            songs = new ArrayList<>();
+            expSearch = Explicit.NONE;
+            dateSearch = false;
+            filterVisible = false;
+            sortMode = MainActivity.sortMode.NONE;
+        }
+        else{
+            if(dateSearch){
+                etDateLower.setText(dateLowerParam);
+                etDateUpper.setText(dateUpperParam);
+            }
+            if(filterVisible){
+                layoutFilter.setVisibility(View.VISIBLE);
+            }
+            switch(expSearch){
+                case EXPLICIT:
+                    chkExplicit.setChecked(true);
+                    break;
+                case CLEAN:
+                    chkClean.setChecked(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         adapter = new SongAdapter(getContext(),songs, MainActivity.songMode.SEARCH, SearchFragment.this);
         adapter.setToken(accessToken);
 
@@ -163,8 +168,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i(TAG,"sorting by popularity");
-                sortSongs(MainActivity.sortMode.POPULARITY_REVERSE);
+                List<Song> temp = sortSongs(MainActivity.sortMode.POPULARITY_REVERSE);
+                songs.clear();
+                songs.addAll(temp);
                 notifyAdapter();
+                filterVisible = false;
                 layoutFilter.setVisibility(View.GONE);
             }
         });
@@ -173,8 +181,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i(TAG,"sorting by date");
-                sortSongs(MainActivity.sortMode.RELEASE);
+                List<Song> temp = sortSongs(MainActivity.sortMode.RELEASE);
+                songs.clear();
+                songs.addAll(temp);
                 notifyAdapter();
+                filterVisible = false;
                 layoutFilter.setVisibility(View.GONE);
             }
         });
@@ -200,9 +211,14 @@ public class SearchFragment extends Fragment {
                 }
 
                 layoutFilter.setVisibility(View.GONE);
+                filterVisible = false;
 
                 if(!songs.isEmpty()){
                     applyFilters();
+                    switch (sortMode){
+                        case POPULARITY_REVERSE:
+                            sortSongs(MainActivity.sortMode.POPULARITY_REVERSE);
+                    }
                 }
             }
         });
@@ -210,15 +226,34 @@ public class SearchFragment extends Fragment {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chkClean.setChecked(false);
-                chkExplicit.setChecked(false);
-                expSearch = Explicit.NONE;
-
-                etDateUpper.setText("");
-                etDateLower.setText("");
-                dateSearch = false;
+                clearFilters();
             }
         });
+
+    }
+
+    private void clearFilters() {
+        chkClean.setChecked(false);
+        chkExplicit.setChecked(false);
+        expSearch = Explicit.NONE;
+
+        etDateUpper.setText("");
+        etDateLower.setText("");
+        dateSearch = false;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG,"saving items");
+        outState.putBoolean("dateSearch",dateSearch);
+        if(dateSearch){
+            outState.putString("dateLower",dateLowerParam);
+            outState.putString("dateUpper",dateUpperParam);
+        }
+        outState.putBoolean("filterView",filterVisible);
+        outState.putSerializable("expSearch",expSearch);
+
     }
 
 
@@ -232,14 +267,12 @@ public class SearchFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Fetch the data remotely
-//                makeRequest(query,true);
-                lastQuery = query;
                 // Reset SearchView
                 searchView.clearFocus();
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 searchItem.collapseActionView();
+
                 Handler mainHandler = new Handler(Looper.getMainLooper());
                 mainHandler.post(new Runnable() {
                     @Override
@@ -248,21 +281,17 @@ public class SearchFragment extends Fragment {
                         progress.setVisibility(ProgressBar.GONE);
                     }
                 });
-
+                Log.i(TAG,"onQueryTextSubmit");
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                if(s != null) {
-                    Log.i(TAG, "text change, new request");
+                if(!s.isEmpty()) {
+                    Log.i(TAG, "query: " + s);
                     makeRequest(s);
-                    lastQuery = s;
-                }else{
-                    songs.clear();
-                    notifyAdapter();
                 }
-                return true;
+                return false;
             }
         });
 
@@ -270,13 +299,15 @@ public class SearchFragment extends Fragment {
         filterItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if(visible){
+                if(filterVisible){
+                    Log.i(TAG,"not filters");
                     layoutFilter.setVisibility(View.GONE);
                 }
                 else{
+                    Log.i(TAG,"showing filters");
                     layoutFilter.setVisibility(View.VISIBLE);
                 }
-                visible = !visible;
+                filterVisible = !filterVisible;
                 return false;
             }
         });
@@ -308,6 +339,18 @@ public class SearchFragment extends Fragment {
 
         call(request);
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG,"onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG,"onDestroy");
     }
 
     private String getUrl(String query){
@@ -360,6 +403,19 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    private void notifyAdapter(){
+        Log.i(TAG,"Notifying SongAdapter");
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                //Update UI
+                adapter.notifyDataSetChanged();
+                rvResults.smoothScrollToPosition(0);
+            }
+        });
+    }
+
     private void applyFilters() {
         List<HashSet<Song>> filtered = new ArrayList<>();
 
@@ -388,10 +444,12 @@ public class SearchFragment extends Fragment {
                 for(Song song : filtered.get(0)){
                     songs.add(song);
                 }
-                notifyAdapter();
                 break;
             default:
+                Log.i(TAG,"do set intersection");
                 songs.clear();
+
+                // do set intersection between all filtered sets
                 HashSet<Song> intersection = new HashSet<>();
                 intersection.addAll(filtered.get(0));
 
@@ -402,45 +460,10 @@ public class SearchFragment extends Fragment {
                 for(Song song:intersection){
                     songs.add(song);
                 }
-                notifyAdapter();
                 break;
         }
-
+        notifyAdapter();
         printSongs(songs);
-    }
-
-    private void notifyAdapter(){
-        Log.i(TAG,"Notifying SongAdapter");
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                //Update UI
-                adapter.notifyDataSetChanged();
-                rvResults.smoothScrollToPosition(0);
-            }
-        });
-    }
-
-    public void goToFragment(Song song, Fragment fragment){
-        Fragment destFragment = fragment;
-        String backStateName = destFragment.getClass().getName();
-
-        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
-
-        if (!fragmentPopped){ //fragment not in back stack, create it.
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.flContainer, destFragment);
-            ft.addToBackStack(backStateName);
-            ft.commit();
-        }
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("song", Parcels.wrap(song));
-        bundle.putString("token",accessToken);
-        destFragment.setArguments(bundle);
-
-        fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
     }
 
     private HashSet<Song> dateRangeSearch(String dateLower, String dateUpper) {
@@ -453,38 +476,30 @@ public class SearchFragment extends Fragment {
         Date d2 = new Date(dateUpper);
         song_ub.setDate(d2);
 
-        // sort the songs from oldest to most recent
-        sortSongs(MainActivity.sortMode.RELEASE);
+        // sort the songs from oldest to most recent & create copy
+        List<Song> temp = sortSongs(MainActivity.sortMode.RELEASE);
 
         SongComparator comparator = new SongComparator(MainActivity.sortMode.RELEASE);
 
         // search for each date
-        int index_lower = lowerBound(songs,song_lb,comparator);
-        int index_upper = upperBound(songs,song_ub,comparator);
+        int index_lower = lowerBound(temp,song_lb,comparator);
+        int index_upper = upperBound(temp,song_ub,comparator);
 
         Log.i(TAG, "lower: " + index_lower + ", upper: " + index_upper);
 
-        List<Song> temp = new ArrayList<>();
         HashSet<Song> set = new HashSet<>();
         // populate list with new results
         for(int i =  index_lower; i < index_upper; i++){
-            Song song = songs.get(i);
-            temp.add(song);
+            Song song = temp.get(i);
             set.add(song);
         }
 
         return set;
-//        songs.clear();
-//        for(Song s: temp){
-//            songs.add(s);
-//        }
-
-//        notifyAdapter();
-
     }
 
     private HashSet<Song> explicitSearch(Explicit mode){
         HashSet<Song> set = new HashSet<>();
+
         if(mode == Explicit.EXPLICIT) {
             for (Song s : songs) {
                 if (s.getExplicit()) {
@@ -499,6 +514,7 @@ public class SearchFragment extends Fragment {
                 }
             }
         }
+
         return set;
     }
 
@@ -558,7 +574,8 @@ public class SearchFragment extends Fragment {
 
     private List<Song> sortSongs(MainActivity.sortMode mode) {
         SongComparator comparator = new SongComparator(mode);
-        List<Song> temp = songs;
+        List<Song> temp = new ArrayList<>();
+        temp.addAll(songs);
         Collections.sort(temp, comparator);
         Log.i(TAG, "new order: ");
         printSongs(temp);
@@ -577,6 +594,38 @@ public class SearchFragment extends Fragment {
                     ", Song: " + song.getSongTitle() +
                             ", URI: " + song.getSongUri());
             i++;
+        }
+    }
+
+    public void goToFragment(Song song, Fragment fragment){
+        Fragment destFragment = fragment;
+        String backStateName = destFragment.getClass().getName();
+
+        boolean fragmentPopped = fragmentManager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.flContainer, destFragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("song", Parcels.wrap(song));
+        bundle.putString("token",accessToken);
+        destFragment.setArguments(bundle);
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer,destFragment).commit();
+    }
+
+    public void reset(){
+        if(songs != null) {
+            if(!songs.isEmpty()) {
+                songs.clear();
+                songs = null;
+                clearFilters();
+                layoutFilter.setVisibility(View.GONE);
+            }
         }
     }
 

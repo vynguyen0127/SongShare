@@ -70,7 +70,7 @@ public class Song implements Comparable<Song> {
             explicit = (Objects.equals(ex, "true"));
 
             popularity = Integer.parseInt(jsonObject.getString("popularity"));
-//            Log.i("Song", "Date: " + releaseDate + ", Popularity: " + popularity + ", Explicit: " + (explicit ? " Yes " : " No") + ", Album: " + albumUrl + ", Artist: " + artist + ", Song: " + songTitle + ", URI: " + songUri);
+            Log.i("Song", "Date: " + releaseDate + ", Popularity: " + popularity + ", Explicit: " + (explicit ? " Yes " : " No") + ", Album: " + albumUrl + ", Artist: " + artist + ", Song: " + songTitle + ", URI: " + songUri);
         }catch(JSONException e){
             e.printStackTrace();
         }

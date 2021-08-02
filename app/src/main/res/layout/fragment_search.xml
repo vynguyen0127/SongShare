@@ -44,8 +44,8 @@
             android:layout_marginEnd="10dp"
             android:background="@color/white"
             android:ems="10"
-            android:inputType="textPersonName"
-            tools:text="YYYY-MM-DD" />
+            android:hint="YYYY-MM-DD"
+            android:inputType="textPersonName" />
 
         <TextView
             android:id="@+id/textView6"
@@ -64,8 +64,8 @@
             android:layout_marginBottom="25dp"
             android:background="@color/white"
             android:ems="10"
-            android:inputType="textPersonName"
-            tools:text="YYYY-MM-DD" />
+            android:hint="YYYY-MM-DD"
+            android:inputType="textPersonName" />
 
         <LinearLayout
             android:layout_width="match_parent"
