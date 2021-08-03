@@ -330,6 +330,10 @@ public class SearchFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 songs.clear();
                 clearFilters(false);
+                searchView.clearFocus();
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                searchItem.collapseActionView();
                 notifyAdapter();
                 return false;
             }
@@ -526,13 +530,10 @@ public class SearchFragment extends Fragment {
 
         Log.i(TAG, "lower: " + index_lower + ", upper: " + index_upper);
 
-
-        if(index_upper == temp.size()-1 && (index_lower != index_upper)){
-            index_upper++;
+        List<Song> set = new ArrayList<>();
+        if(index_lower != index_upper) {
+            set = temp.subList(index_lower, index_upper);
         }
-
-        List<Song> set = temp.subList(index_lower,index_upper);
-
         return set;
     }
 
@@ -546,14 +547,15 @@ public class SearchFragment extends Fragment {
             }
         }
 
+        printSongs(set);
         return set;
     }
 
     // returns an index 1 past the smallest value greater than or equal to the target
-    private int upperBound(List<Song> songs, Song target, Comparator comparator) {
+    private int upperBound(List<Song> s, Song target, Comparator comparator) {
 
         int mid;
-        int n = songs.size() - 1;
+        int n = s.size() - 1;
 
         int low = 0;
         int high = n;
@@ -562,7 +564,7 @@ public class SearchFragment extends Fragment {
             mid = low + (high - low) / 2;
 
             // if target >= songs[mid]
-            if(comparator.compare(target,songs.get(mid)) >= 0){
+            if(comparator.compare(target,s.get(mid)) >= 0){
                 low = mid + 1;
             }
             else{
@@ -571,17 +573,20 @@ public class SearchFragment extends Fragment {
         }
 
         // song[low] <= target
-        while (low < n && (comparator.compare(songs.get(low), target) <= 0)) {
+        while (low < n && (comparator.compare(s.get(low), target) <= 0)) {
             low++;
+        }
+        if(low == n){
+            low = (comparator.compare(s.get(low),target) <= 0) ? low + 1 : low;
         }
 
         return low;
     }
 
     // returns an index to the greatest value less than or equal to the target
-    private int lowerBound(List<Song> songs, Song target, Comparator comparator) {
+    private int lowerBound(List<Song> s, Song target, Comparator comparator) {
         int mid;
-        int n = songs.size() - 1;
+        int n = s.size() - 1;
 
         int low  = 0;
         int high = n;
@@ -590,7 +595,7 @@ public class SearchFragment extends Fragment {
             mid = low + (high - low) / 2;
 
             // if target <= songs[mid]
-            if(comparator.compare(target,songs.get(mid)) <= 0){
+            if(comparator.compare(target,s.get(mid)) <= 0){
                 high = mid;
             }
             else{
@@ -599,8 +604,12 @@ public class SearchFragment extends Fragment {
         }
 
 
-        if(low < n && (comparator.compare(songs.get(low),target) < 0)){
+        if(low < n && (comparator.compare(s.get(low),target) < 0)){
             low++;
+        }
+
+        if(low == n){
+            low = (comparator.compare(s.get(low),target) <= 0) ? low + 1 : low;
         }
 
 

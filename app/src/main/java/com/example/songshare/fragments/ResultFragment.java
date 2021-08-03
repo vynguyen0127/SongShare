@@ -56,6 +56,7 @@ public class ResultFragment extends Fragment {
     String songsString;
     String genresString;
     String uri;
+    Boolean fromRec;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,22 +80,25 @@ public class ResultFragment extends Fragment {
         seed_genres = bundle.getStringArrayList("genres");
         seed_songs = bundle.getStringArrayList("songs");
         accessToken = bundle.getString("token");
+        fromRec = bundle.getBoolean("fromRec");
         uri = bundle.getString("uri");
+
         fragmentManager = getActivity().getSupportFragmentManager();
         artistsString = arrayToString(seed_artists);
         songsString = arrayToString(seed_songs);
         genresString = arrayToString(seed_genres);
 
         rvResults = view.findViewById(R.id.rvResults);
+        if(fromRec) {
+            bundle.putBoolean("fromRec",false);
+            results = new ArrayList<>();
+            makeRequest();
+        }
 
-        results = new ArrayList<>();
         adapter = new SongAdapter(getContext(),results, MainActivity.songMode.RECOMMEND,ResultFragment.this);
 
         rvResults.setAdapter(adapter);
         rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));
-
-        makeRequest();
-
     }
 
     private String arrayToString(ArrayList<String> seed) {
@@ -111,7 +115,7 @@ public class ResultFragment extends Fragment {
         return s;
     }
 
-    private void makeRequest () {
+    public void makeRequest() {
 
         if (accessToken == null) {
             Log.e(TAG,"no token");

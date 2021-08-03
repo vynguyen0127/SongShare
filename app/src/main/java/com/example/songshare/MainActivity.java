@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         feedFragment = new FeedFragment();
         profileFragment = new ProfileFragment();
@@ -121,33 +120,30 @@ public class MainActivity extends AppCompatActivity {
         recommendFragment = new RecommendFragment();
         mView = this.getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.cream));
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment fragment;
-                switch (item.getItemId()) {
-                    case R.id.action_home:
-                        // do something here
-                        fragment = feedFragment;
-                        break;
-                    case R.id.action_profile:
-                        // do something here
-                        fragment = profileFragment;
-                        break;
-                    case R.id.action_search:
-                        // do something here
-                        fragment = searchFragment;
-                        break;
-                    case R.id.action_recommend:
-                        fragment = recommendFragment;
-                        break;
-                    default:
-                        fragment = feedFragment;
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            Fragment fragment;
+            switch (item.getItemId()) {
+                case R.id.action_home:
+                    // do something here
+                    fragment = feedFragment;
+                    break;
+                case R.id.action_profile:
+                    // do something here
+                    fragment = profileFragment;
+                    break;
+                case R.id.action_search:
+                    // do something here
+                    fragment = searchFragment;
+                    break;
+                case R.id.action_recommend:
+                    fragment = recommendFragment;
+                    break;
+                default:
+                    fragment = feedFragment;
 
-                }
-                fragmentManager.beginTransaction().replace(R.id.flContainer,fragment).commit();
-                return true;
             }
+            fragmentManager.beginTransaction().replace(R.id.flContainer,fragment).commit();
+            return true;
         });
         bottomNavigationView.setSelectedItemId(R.id.action_home);
         ((SearchFragment) searchFragment).setToken(accessTokenSpotify);

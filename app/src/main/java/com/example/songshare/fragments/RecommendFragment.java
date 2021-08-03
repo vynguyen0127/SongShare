@@ -125,7 +125,6 @@ public class RecommendFragment extends Fragment {
         btnRecommend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String uri = fetchUserUri();
                 Toast.makeText(getContext(),"Fetching new songs!",Toast.LENGTH_SHORT).show();
                 goToResultFragment();
             }
@@ -288,6 +287,7 @@ public class RecommendFragment extends Fragment {
         bundle.putStringArrayList("genres",seed_genres);
         bundle.putString("token",accessToken);
         bundle.putString("uri",uri);
+        bundle.putBoolean("fromRec",true);
         resultFragment.setArguments(bundle);
 
         fragmentManager.beginTransaction().replace(R.id.flContainer,resultFragment).commit();

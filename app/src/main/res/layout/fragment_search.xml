@@ -144,9 +144,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:text="Clean Only"
-                    android:textOff="any"
-                    android:textOn="clean" />
+                    android:textOff="Any Song"
+                    android:textOn="Clean Songs Only" />
 
             </LinearLayout>
 
