@@ -6,6 +6,9 @@
         android:id="@+id/filter"
         android:title="Filter" />
     <item
+        android:id="@+id/clear"
+        android:title="Clear Search" />
+    <item
         android:id="@+id/app_bar_search"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="search"

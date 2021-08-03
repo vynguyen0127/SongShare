@@ -102,7 +102,6 @@ public class RecommendFragment extends Fragment {
 
         songs = new ArrayList<>();
         songAdapter = new SongAdapter(getContext(), songs, MainActivity.songMode.SEED);
-        songAdapter.setToken(accessToken);
 
         artists = new ArrayList<>();
         artistAdapter = new ArtistAdapter(getContext(), artists);

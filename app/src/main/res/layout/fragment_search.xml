@@ -1,104 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.SearchFragment">
 
-    <LinearLayout
-        android:id="@+id/layoutFilter"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvFilter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EE93F4"
-        android:orientation="vertical">
+        android:visibility="gone"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="8dp"
+        tools:visibility="visible">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:id="@+id/layoutFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EE93F4"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSortPopular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="Sort by popularity" />
+
+                <Button
+                    android:id="@+id/btnSortDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Sort by date" />
+
+                <ImageButton
+                    android:id="@+id/ibClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#00FFFFFF"
+                    android:src="@android:drawable/btn_dialog" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/baloo"
+                android:text="Release Date Range Search"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etDateLower"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:hint="YYYY-MM-DD"
+                    android:inputType="datetime" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TO" />
+
+                <EditText
+                    android:id="@+id/etDateUpper"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:hint="YYYY-MM-DD"
+                    android:inputType="datetime" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/baloo"
+                android:text="@string/popularity_range_search"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etPopLower"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:inputType="datetime" />
+
+                <TextView
+                    android:id="@+id/tvTo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TO" />
+
+                <EditText
+                    android:id="@+id/etPopUpper"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:inputType="datetime" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ToggleButton
+                    android:id="@+id/swClean"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Clean Only"
+                    android:textOff="any"
+                    android:textOn="clean" />
+
+            </LinearLayout>
 
             <Button
-                android:id="@+id/btnSortPopular"
+                android:id="@+id/btnRangeSearch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
-                android:text="Sort by popularity" />
+                android:layout_marginEnd="10dp"
+                android:text="Apply filters" />
 
             <Button
-                android:id="@+id/btnSortDate"
+                android:id="@+id/btnClear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="Sort by date" />
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="clear filters" />
+
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/etDateLower"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="10dp"
-            android:background="@color/white"
-            android:ems="10"
-            android:hint="YYYY-MM-DD"
-            android:inputType="textPersonName" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:text="TO" />
-
-        <EditText
-            android:id="@+id/etDateUpper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="25dp"
-            android:background="@color/white"
-            android:ems="10"
-            android:hint="YYYY-MM-DD"
-            android:inputType="textPersonName" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/chkClean"
-                android:layout_width="225dp"
-                android:layout_height="wrap_content"
-                android:text="Clean" />
-
-            <CheckBox
-                android:id="@+id/chkExplicit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Explicit" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnRangeSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Apply filters" />
-
-        <Button
-            android:id="@+id/btnClear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="clear filters" />
-
-    </LinearLayout>
-
+    </androidx.cardview.widget.CardView>
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="match_parent"
@@ -107,6 +176,14 @@
         android:max="100"
         android:indeterminate="true"
         android:visibility="gone" />
+
+
+    <TextView
+        android:id="@+id/tvFail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NO RESULTS FOR QUERY. PLEASE TRY AGAIN"
+        android:textAlignment="center" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResults"

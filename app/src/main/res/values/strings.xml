@@ -26,6 +26,7 @@
     <string name="splash_page">THIS IS MY SPLASH PAGE YAY</string>
     <string name="caption_hint">Add a caption...</string>
     <string name="post">Post</string>
+    <string name="popularity_range_search">Popularity Range Search</string>
 
 
 </resources>

@@ -242,10 +242,7 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
         private final SeekBar.OnSeekBarChangeListener seekBarChangeListener =
                 new SeekBar.OnSeekBarChangeListener() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-
-                    }
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {}

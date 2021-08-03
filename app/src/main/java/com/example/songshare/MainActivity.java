@@ -128,12 +128,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.action_home:
                         // do something here
-                        ((SearchFragment)searchFragment).reset();
                         fragment = feedFragment;
                         break;
                     case R.id.action_profile:
                         // do something here
-                        ((SearchFragment)searchFragment).reset();
                         fragment = profileFragment;
                         break;
                     case R.id.action_search:
@@ -141,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                         fragment = searchFragment;
                         break;
                     case R.id.action_recommend:
-                        ((SearchFragment)searchFragment).reset();
                         fragment = recommendFragment;
                         break;
                     default:
@@ -339,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onConnected(SpotifyAppRemote spotifyAppRemote) {
                         remote = spotifyAppRemote;
                         Log.d(TAG, "Connected! Yay!");
-                        customSnackbar = CustomSnackbar.make(findViewById(R.id.activity_main),CustomSnackbar.LENGTH_INDEFINITE,remote);
+                        customSnackbar = CustomSnackbar.make(findViewById(R.id.coordinator),CustomSnackbar.LENGTH_INDEFINITE,remote);
                         customSnackbar.setPlayer();
                         customSnackbar.setAction();
                         // Now you can start interacting with App Remote

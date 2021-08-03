@@ -138,7 +138,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvSongTitle.setText(post.getSongTitle());
             tvArtist.setText(post.getArtist());
 
-
             tvUsername.setText("@" + post.getUser().getUsername());
             tvCaption.setText(post.getCaption());
             tvCreatedAt.setText(post.calculateTimeAgo(post.getCreatedAt()));

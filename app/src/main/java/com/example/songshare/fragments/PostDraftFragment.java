@@ -78,9 +78,6 @@ public class PostDraftFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 savePost(ParseUser.getCurrentUser());
-//                InputMethodManager mgr = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                mgr.hideSoftInputFromWindow(etCaption.getWindowToken(), 0);
-
             }
         });
     }

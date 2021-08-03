@@ -91,8 +91,6 @@ public class ResultFragment extends Fragment {
 
         results = new ArrayList<>();
         adapter = new SongAdapter(getContext(),results, MainActivity.songMode.RECOMMEND,ResultFragment.this);
-        adapter.setToken(accessToken);
-        adapter.setUri(uri);
 
         rvResults.setAdapter(adapter);
         rvResults.setLayoutManager(new GridLayoutManager(getContext(),2));

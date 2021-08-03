@@ -39,11 +39,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     MainActivity.songMode songMode;
     Fragment fragment;
 
-    String token;
-    String uri;
-    private static final String CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String REDIRECT_URI = "http://localhost:8888/";
-
     public static final String TAG = "SongAdapter";
 
     public SongAdapter(Context context, List<Song> songs, MainActivity.songMode songMode, Fragment fragment){
@@ -59,13 +54,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.songMode = songMode;
     }
 
-    public void setToken(String token){
-        this.token = token;
-    }
-
-    public void setUri(String uri){
-        this.uri = uri;
-    }
 
     @NonNull
     @NotNull

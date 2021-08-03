@@ -149,6 +149,7 @@
                     android:clickable="true"
                     android:scaleType="centerCrop"
                     card_view:srcCompat="@drawable/ufi_heart" />
+
             </LinearLayout>
 
         </LinearLayout>
