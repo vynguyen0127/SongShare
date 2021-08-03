@@ -187,7 +187,7 @@ public class SearchFragment extends Fragment {
                 songs.addAll(temp);
                 notifyAdapter();
                 filterVisible = false;
-                layoutFilter.setVisibility(View.GONE);
+                cvFilter.setVisibility(View.GONE);
             }
         });
 
@@ -201,7 +201,7 @@ public class SearchFragment extends Fragment {
                 songs.addAll(temp);
                 notifyAdapter();
                 filterVisible = false;
-                layoutFilter.setVisibility(View.GONE);
+                cvFilter.setVisibility(View.GONE);
             }
         });
 
@@ -237,7 +237,7 @@ public class SearchFragment extends Fragment {
                     cleanSearch = false;
                 }
 
-                layoutFilter.setVisibility(View.GONE);
+                cvFilter.setVisibility(View.GONE);
                 filterVisible = false;
 
 
@@ -290,8 +290,6 @@ public class SearchFragment extends Fragment {
                 lastQuery = query;
                 // Reset SearchView
                 searchView.clearFocus();
-                searchView.setQuery("", false);
-                searchView.setIconified(true);
                 searchItem.collapseActionView();
 
                 Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -469,8 +467,6 @@ public class SearchFragment extends Fragment {
         }
 
         if(popSearch){
-            Log.i(TAG,"into pop search");
-            printSongs(temp);
             temp = popularitySearch(temp);
         }
 
@@ -481,6 +477,7 @@ public class SearchFragment extends Fragment {
         if(temp.isEmpty()){
             tvFail.setVisibility(View.VISIBLE);
         }
+
 
         songs.clear();
         songs.addAll(temp);

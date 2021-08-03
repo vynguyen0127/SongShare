@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -279,6 +281,7 @@ public class PlaylistAddFragment extends Fragment {
         EditText etPlaylistDesc;
         Switch switchPublic;
         Button btnAdd;
+        ImageButton ibExit;
 
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
@@ -289,6 +292,7 @@ public class PlaylistAddFragment extends Fragment {
         etPlaylistDesc = popupView.findViewById(R.id.etPlaylistDesc);
         switchPublic = popupView.findViewById(R.id.switchPublic);
         btnAdd = popupView.findViewById(R.id.btnAdd);
+        ibExit = popupView.findViewById(R.id.ibExit);
 
         // create the popup window
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -308,7 +312,18 @@ public class PlaylistAddFragment extends Fragment {
                 String desc = etPlaylistDesc.getText().toString();
                 String playlistPublic = switchPublic.isChecked() ? "true" : "false";
 
-                createPlaylist(name,desc, playlistPublic);
+                if(etPlaylist.getText().toString().isEmpty()){
+                    Toast.makeText(getContext(),"Playlist name cannot be empty",Toast.LENGTH_SHORT).show();
+                }else {
+                    createPlaylist(name, desc, playlistPublic);
+                    popupWindow.dismiss();
+                }
+            }
+        });
+
+        ibExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 popupWindow.dismiss();
             }
         });

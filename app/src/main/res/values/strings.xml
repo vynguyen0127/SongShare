@@ -27,6 +27,7 @@
     <string name="caption_hint">Add a caption...</string>
     <string name="post">Post</string>
     <string name="popularity_range_search">Popularity Range Search</string>
+    <string name="query_fail_msg">No results for query, please try again.</string>
 
 
 </resources>

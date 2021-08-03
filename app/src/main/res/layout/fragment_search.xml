@@ -182,7 +182,7 @@
         android:id="@+id/tvFail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NO RESULTS FOR QUERY. PLEASE TRY AGAIN"
+        android:text="@string/query_fail_msg"
         android:textAlignment="center" />
 
     <androidx.recyclerview.widget.RecyclerView

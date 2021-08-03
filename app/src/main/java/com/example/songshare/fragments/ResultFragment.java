@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,10 +42,9 @@ public class ResultFragment extends Fragment {
 
     public static final String TAG = "RecommendActivity";
     private String accessToken;
-    private ProgressBar progress;
     OkHttpClient okHttpClient = new OkHttpClient();
     SongAdapter adapter;
-    List<Song> results;
+    static List<Song> results;
     RecyclerView rvResults;
 
     ArrayList<String> seed_artists;
