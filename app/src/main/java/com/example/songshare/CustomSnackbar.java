@@ -87,6 +87,7 @@ public class CustomSnackbar extends BaseTransientBottomBar<CustomSnackbar> {
 
         ImageButton actionView = (ImageButton) getView().findViewById(R.id.play);
         actionView.setVisibility(View.VISIBLE);
+
         actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
