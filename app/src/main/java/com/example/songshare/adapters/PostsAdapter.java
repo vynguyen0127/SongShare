@@ -224,7 +224,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
 
         private boolean checkUserLiked(Post post){
-            Log.i(TAG,"Checking song liked.... " + post.getSongTitle());
 
             String userId = ParseUser.getCurrentUser().getObjectId();
 
@@ -234,7 +233,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 try {
                     j = new JSONObject(a.get(i).toString());
                     if(Objects.equals(j.getString("objectId"), userId)){
-                        Log.i(TAG,"user liked this post! Song: " + post.getSongTitle());
                         ibLike.setImageDrawable(context.getResources().getDrawable(R.drawable.ufi_heart_active));
                         return true;
                     }

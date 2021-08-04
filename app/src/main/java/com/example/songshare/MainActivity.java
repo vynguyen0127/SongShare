@@ -56,11 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
     private static final String SPOTIFY_CLIENT_ID = "1cb8dc3da6564e51af249a98d3d0eba1";
-    private static final String GENIUS_CLIENT_ID = "7vKofpT_Y7XPvfvr0w6ys81GxaFajMoaEBz2-AeK3nKJXpbaDI-GP6RU_4488oCJ";
     private static final String REDIRECT_URI = "http://localhost:8888/";
     private static final int REQUEST_CODE = 1337;
     private String accessTokenSpotify;
-    private String accessTokenGenius;
     private String currentUserUri;
     String userId;
     View mView;
@@ -76,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public enum songMode {
         SEED,
         RECOMMEND,
-        SEARCH,
-        PROFILE
+        SEARCH
     }
 
     public enum postMode{

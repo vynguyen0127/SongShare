@@ -26,8 +26,18 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Objects;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class PostDetailFragment extends Fragment {
 
@@ -36,6 +46,14 @@ public class PostDetailFragment extends Fragment {
     private TextView tvArtist;
     private ImageView ivAlbum;
 
+    TextView tvPopularity;
+    TextView tvReleaseDate;
+    TextView tvCaption;
+
+    String pop;
+    String release;
+    String accessToken;
+    OkHttpClient okHttpClient = new OkHttpClient();
     public static final String TAG = "PostDetailFragment";
 
 
@@ -68,13 +86,25 @@ public class PostDetailFragment extends Fragment {
         tvSongTitle = view.findViewById(R.id.tvTitle);
         tvArtist = view.findViewById(R.id.tvArtist);
         ivAlbum = view.findViewById(R.id.ivCover);
+        tvPopularity = view.findViewById(R.id.tvPopularity);
+        tvReleaseDate = view.findViewById(R.id.tvReleaseDate);
+        tvCaption = view.findViewById(R.id.tvCaption);
 
+        tvCaption.setText(post.getCaption());
         tvSongTitle.setText(post.getSongTitle());
         tvArtist.setText(post.getArtist());
         Glide.with(getContext())
                 .load(post.getAlbumURL())
                 .into(ivAlbum);
+        makeRequest();
 
+        ivAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getContext()).remote.getPlayerApi().play(post.getSongUri());
+                ((MainActivity)getContext()).showPlayer();
+            }
+        });
     }
 
     @Override
@@ -154,4 +184,67 @@ public class PostDetailFragment extends Fragment {
         MainActivity.bottomNavigationView.setSelectedItemId(R.id.action_home);
     }
 
+    private String extractId(){
+        String temp;
+        temp = post.getSongUri().toString();
+        temp = temp.substring(14);
+        Log.i(TAG,"extracted id: " + temp);
+        return temp;
+    }
+
+    private void makeRequest () {
+
+        accessToken = ((MainActivity)this.getActivity()).getAccessTokenSpotify();
+
+        if (accessToken == null) {
+            Log.e(TAG,"no token");
+            return;
+        }
+
+        String url = getUrl();
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
+
+        call(request);
+
+    }
+
+    private String getUrl(){
+        String temp = extractId();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/tracks/%s",temp)).newBuilder();
+        return urlBuilder.build().toString();
+    }
+
+    private void call(Request request){
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.i(TAG,"onFailure");
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+
+                    pop = json.getString("popularity");
+
+                    JSONObject album = json.getJSONObject("album");
+                    release = album.getString("release_date");
+                    tvPopularity.setText(pop);
+                    tvReleaseDate.setText(release);
+                    Log.i(TAG,"json: " + album.toString());
+
+                } catch (JSONException e) {
+                    Log.i(TAG,e.toString());
+                }
+            }
+
+        });
+    }
 }

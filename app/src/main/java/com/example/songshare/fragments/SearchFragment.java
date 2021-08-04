@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.songshare.DateComparator;
 import com.example.songshare.MainActivity;
 import com.example.songshare.R;
 import com.example.songshare.SongComparator;
@@ -213,9 +215,14 @@ public class SearchFragment extends Fragment {
                 // if no lower date entered, input all 0
                 // if no upper date entered, put some future date
                 if(!etDateLower.getText().toString().isEmpty() && !etDateUpper.getText().toString().isEmpty()){
-                    dateLowerParam = etDateLower.getText().toString();
-                    dateUpperParam = etDateUpper.getText().toString();
-                    dateSearch = true;
+                    if(checkDateInput(etDateLower.getText().toString(),etDateUpper.getText().toString())) {
+                        dateLowerParam = etDateLower.getText().toString();
+                        dateUpperParam = etDateUpper.getText().toString();
+                    }
+                    else{
+                        Toast.makeText(getContext(),"date formatting issue",Toast.LENGTH_SHORT).show();
+                    }
+
                 }else{
                     dateSearch = false;
                 }
@@ -241,8 +248,8 @@ public class SearchFragment extends Fragment {
                 filterVisible = false;
 
 
-                makeRequest(lastQuery);
-
+                if(lastQuery != null)
+                    makeRequest(lastQuery);
 
                 hideKeyboard();
             }
@@ -255,6 +262,73 @@ public class SearchFragment extends Fragment {
             }
         });
 
+    }
+
+    private boolean checkDateInput(String lowerParam, String upperParam) {
+
+        if(lowerParam.length() < 10 || upperParam.length() < 10){
+            return false;
+        }else{
+
+            // check that 4,7 are '-'
+            for(int i = 0; i < 4; i++){
+                Boolean flag = Character.isDigit(lowerParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in lower param year");
+                    return false;
+                }
+            }
+
+            for(int i = 5; i < 7; i++){
+                Boolean flag = Character.isDigit(lowerParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in lower param month");
+                    return false;
+                }
+            }
+
+            for(int i = 8; i < 10; i++){
+                Boolean flag = Character.isDigit(lowerParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in lower param day");
+                    return false;
+                }
+            }
+
+            for(int i = 0; i < 4; i++){
+                Boolean flag = Character.isDigit(upperParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in upper param year");
+                    return false;
+                }
+            }
+
+            for(int i = 5; i < 7; i++){
+                Boolean flag = Character.isDigit(upperParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in upper param month");
+                    return false;
+                }
+            }
+
+            for(int i = 8; i < 10; i++){
+                Boolean flag = Character.isDigit(upperParam.charAt(i));
+                if(!flag){
+                    Log.i(TAG,"issue in upper param day");
+                    return false;
+                }
+            }
+        }
+
+        Date d1 = new Date(lowerParam);
+        Date d2 = new Date(upperParam);
+
+        DateComparator comparator = new DateComparator();
+        if(comparator.compare(d1,d2) > 0){
+            return false;
+        }
+
+        return true;
     }
 
     private void clearFilters(boolean b) {
@@ -271,7 +345,6 @@ public class SearchFragment extends Fragment {
 
         sortMode = MainActivity.sortMode.NONE;
         if(b){
-            adjustFilterView();
             makeRequest(lastQuery);
             hideKeyboard();
         }
@@ -334,6 +407,7 @@ public class SearchFragment extends Fragment {
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 searchItem.collapseActionView();
+                tvFail.setVisibility(View.GONE);
                 notifyAdapter();
                 return false;
             }

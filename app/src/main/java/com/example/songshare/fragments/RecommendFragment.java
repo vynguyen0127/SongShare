@@ -45,6 +45,7 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -340,10 +341,10 @@ public class RecommendFragment extends Fragment {
 
     private String fetchUserUri(){ return ((MainActivity)this.getActivity()).getCurrentUserUri(); }
 
-    private void makeRequest(String id, boolean b) {
+    private void makeRequest(String id, boolean relatedSearch) {
         String url = String.format("https://api.spotify.com/v1/artists/%s",id);
 
-        if(b){
+        if(relatedSearch){
             url += "/related-artists";
         }
 
@@ -365,8 +366,8 @@ public class RecommendFragment extends Fragment {
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData);
 
-                    if(b){
-                        // add artists related artist to array
+                    if(relatedSearch){
+                        // add artist's related artist to array
                         JSONArray jsonArtists = new JSONArray(jsonObject.get("artists").toString());
                         for(int i = 0; i < 5; i++){
                             Artist artist = new Artist(jsonArtists.getJSONObject(i));
@@ -387,9 +388,7 @@ public class RecommendFragment extends Fragment {
                     else{
                         // fetch artist's genres
                         JSONArray genres = new JSONArray(jsonObject.get("genres").toString());
-
                         seed_genres.add(genres.get(0).toString());
-
                     }
 
                 } catch (JSONException e) {
@@ -406,40 +405,76 @@ public class RecommendFragment extends Fragment {
     }
 
     private void addSongs(){
-        songs.add(new Song("https://i.scdn.co/image/ab67616d00001e02ba5db46f4b838ef6027e6f96","Ed Sheeran","Perfect","spotify:track:0tgVpDi06FyKpA1z0VMD4v","0tgVpDi06FyKpA1z0VMD4v"));
-        songs.add(new Song("https://i.scdn.co/image/ab67616d00001e021c76e29153f29cc1e1b2b434","Logic","Perfect","spotify:track:5jbDih9bLGmI8ycUKkN5XA","5jbDih9bLGmI8ycUKkN5XA"));
-        songs.add(new Song("https://i.scdn.co/image/ab67616d00001e02241e4fe75732c9c4b49b94c3","One Direction","Perfect","spotify:track:3NLnwwAQbbFKcEcV8hDItk","3NLnwwAQbbFKcEcV8hDItk"));
-        songs.add(new Song("https://i.scdn.co/image/ab67616d00001e0293432e914046a003229378da","5 Seconds of Summer","She Looks So Perfect", "spotify:track:1gugDOSMREb34Xo0c1PlxM","1gugDOSMREb34Xo0c1PlxM"));
-
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                //Update UI
-                songAdapter.notifyDataSetChanged();
-            }
-        });
+        getUserFavorites(true);
     }
 
     private void addArtists(){
-        artists.add(new Artist("Harry Styles","6KImCVD70vtIoJWnq6nGn3","https://i.scdn.co/image/ab67616100005174d9f70439ec8893ef495e1b7e"));
-        artists.add(new Artist("Olivia Rodrigo","1McMsnEElThX1knmY4oliG","https://i.scdn.co/image/ab6761610000e5eb8885ead433869bbbe56dd2da"));
-        artists.add(new Artist("5 Seconds of Summer","5Rl15oVamLq7FbSb0NNBNy","https://i.scdn.co/image/ab6761610000f178ffe8513647c422e6d93ed94a"));
-        artists.add(new Artist("Billie Eilish","6qqNVTkY8uBg9cP3Jd7DAH","https://i.scdn.co/image/ab67616100005174d8b9980db67272cb4d2c3daf"));
+        getUserFavorites(false);
+    }
+    private void getUserFavorites(boolean songSearch) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/me/top/%s",
+                (songSearch) ? "tracks" : "artists")).newBuilder();
+        urlBuilder.addQueryParameter("limit","50");
+        urlBuilder.addQueryParameter("time_range","short_term");
+        String url = urlBuilder.build().toString();
 
-        seen_artists.add("6KImCVD70vtIoJWnq6nGn3");
-        seen_artists.add("1McMsnEElThX1knmY4oliG");
-        seen_artists.add("5Rl15oVamLq7FbSb0NNBNy");
-        seen_artists.add("6qqNVTkY8uBg9cP3Jd7DAH");
+        final Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
 
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(new Runnable() {
+        okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void run() {
-                //Update UI
-                artistAdapter.notifyDataSetChanged();
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.i(TAG,"onFailure");
             }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+
+                    if(songSearch){
+                        JSONArray tracks = jsonObject.getJSONArray("items");
+                        songs.addAll(Song.fromJsonArray(tracks));
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Update UI
+                                songAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                    else{
+                        JSONArray jsonArtists = jsonObject.getJSONArray("items");
+                        for (int i = 0; i < jsonArtists.length(); i++){
+                            Artist a = new Artist(jsonArtists.getJSONObject(i));
+                            artists.add(a);
+
+                            JSONObject j = jsonArtists.getJSONObject(i);
+                            seen_artists.add(j.getString("id"));
+                        }
+
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Update UI
+                                artistAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    Log.i(TAG,"json: " + jsonObject);
+
+                } catch (JSONException e) {
+                    Log.i(TAG,e.toString());
+                }
+            }
+
         });
     }
-
 }
