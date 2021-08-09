@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -143,7 +142,7 @@ public class FeedFragment extends Fragment {
 
                 }
                 else {
-                    Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Swipe left!", Toast.LENGTH_SHORT).show();
                     rvPosts.getAdapter().notifyItemChanged(viewHolder.getAdapterPosition());
 
                     goToFragment(post, song, new PostDetailFragment());

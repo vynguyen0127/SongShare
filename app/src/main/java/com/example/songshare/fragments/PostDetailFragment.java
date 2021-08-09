@@ -88,9 +88,7 @@ public class PostDetailFragment extends Fragment {
         ivAlbum = view.findViewById(R.id.ivCover);
         tvPopularity = view.findViewById(R.id.tvPopularity);
         tvReleaseDate = view.findViewById(R.id.tvReleaseDate);
-        tvCaption = view.findViewById(R.id.tvCaption);
 
-        tvCaption.setText(post.getCaption());
         tvSongTitle.setText(post.getSongTitle());
         tvArtist.setText(post.getArtist());
         Glide.with(getContext())

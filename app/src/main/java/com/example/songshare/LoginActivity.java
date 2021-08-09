@@ -6,10 +6,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     String profile_url;
     String id;
     String access_token;
+    ImageView ivLogo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +46,22 @@ public class LoginActivity extends AppCompatActivity {
         display_name = getIntent().getStringExtra("display_name");
         profile_url = getIntent().getStringExtra("profile_url");
         id = getIntent().getStringExtra("id");
-
+        access_token = getIntent().getStringExtra("token");
         Log.i(TAG,"uri: " + uri);
 
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
+        ivLogo = findViewById(R.id.ivLogo);
 
+        Glide.with(LoginActivity.this)
+                .load(R.drawable.logo)
+                .into(ivLogo);
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(getResources().getColor(R.color.light_blue));
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
                 i.putExtra("id",id);
                 i.putExtra("token",access_token);
                 startActivity(i);
-                finish();
             }
         });
     }

@@ -178,11 +178,14 @@
 
 
     <TextView
-        android:id="@+id/tvFail"
+        android:id="@+id/tvMsg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/query_fail_msg"
-        android:textAlignment="center" />
+        android:fontFamily="@font/baloo"
+        android:text="@string/search_msg"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResults"

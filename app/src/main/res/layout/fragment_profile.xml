@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:fontFamily="@font/baloo"
-            android:textAlignment="textEnd"
+            android:textAlignment="viewStart"
             android:textSize="26sp"
             android:textStyle="bold"
             tools:text="Username" />

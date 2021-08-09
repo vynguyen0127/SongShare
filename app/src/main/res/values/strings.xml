@@ -27,7 +27,8 @@
     <string name="caption_hint">Add a caption...</string>
     <string name="post">Post</string>
     <string name="popularity_range_search">Popularity Range Search</string>
-    <string name="query_fail_msg">No results for query, please try again.</string>
+    <string name="search_msg">Start your search for songs here!</string>
+    <string name="spotify_verify_msg">Is this your Spotify account?</string>
 
 
 </resources>

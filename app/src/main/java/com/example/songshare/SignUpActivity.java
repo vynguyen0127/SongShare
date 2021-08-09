@@ -57,7 +57,7 @@ public class SignUpActivity extends AppCompatActivity {
         access_token = getIntent().getStringExtra("token");
 
         Log.i(TAG,"uri: " + uri);
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnSignUp = findViewById(R.id.btnSignUp);

@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        authorizeAccount();
         Log.i("MainActivity", "Main opened!");
         setContentView(R.layout.activity_main);
 
@@ -156,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG,"onPause");
         authorizeAccount();
     }
+
 
     public void authorizeAccount(){
         // Log in to Spotify Account to receive authorization

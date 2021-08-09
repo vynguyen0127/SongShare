@@ -126,7 +126,7 @@ public class RecommendFragment extends Fragment {
         btnRecommend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"Fetching new songs!",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(),"Fetching new songs!",Toast.LENGTH_SHORT).show();
                 goToResultFragment();
             }
         });
@@ -411,11 +411,12 @@ public class RecommendFragment extends Fragment {
     private void addArtists(){
         getUserFavorites(false);
     }
+
     private void getUserFavorites(boolean songSearch) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(String.format("https://api.spotify.com/v1/me/top/%s",
                 (songSearch) ? "tracks" : "artists")).newBuilder();
         urlBuilder.addQueryParameter("limit","50");
-        urlBuilder.addQueryParameter("time_range","short_term");
+        urlBuilder.addQueryParameter("time_range","medium_term");
         String url = urlBuilder.build().toString();
 
         final Request request = new Request.Builder()

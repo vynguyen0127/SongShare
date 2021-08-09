@@ -11,6 +11,7 @@
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo"
         android:text="SONGS" />
 
 <!--    <androidx.recyclerview.widget.RecyclerView-->
@@ -39,6 +40,7 @@
         android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo"
         android:text="ARTISTS" />
 
     <com.yuyakaido.android.cardstackview.CardStackView

@@ -72,8 +72,8 @@ public class SearchFragment extends Fragment {
     FragmentManager fragmentManager;
     String dateLowerParam;
     String dateUpperParam;
-    String popLowerParam;
-    String popUpperParam;
+    static int popLower;
+    static int popUpper;
     String lastQuery;
 
     private final OkHttpClient okHttpClient = new OkHttpClient();
@@ -89,7 +89,7 @@ public class SearchFragment extends Fragment {
     EditText etPopUpper;
     LinearLayout layoutFilter;
     CardView cvFilter;
-    TextView tvFail;
+    TextView tvMsg;
 
     ToggleButton swClean;
 
@@ -134,8 +134,8 @@ public class SearchFragment extends Fragment {
         btnSortPopular = view.findViewById(R.id.btnSortPopular);
         btnSortDate = view.findViewById(R.id.btnSortDate);
         ibClose = view.findViewById(R.id.ibClose);
-        tvFail = view.findViewById(R.id.tvFail);
-        tvFail.setVisibility(View.GONE);
+        tvMsg = view.findViewById(R.id.tvMsg);
+
 
         ibClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +152,7 @@ public class SearchFragment extends Fragment {
             filterVisible = false;
             popSearch = false;
             sortMode = MainActivity.sortMode.NONE;
+            tvMsg.setVisibility(View.VISIBLE);
         }
         else{
             if(dateSearch){
@@ -159,8 +160,8 @@ public class SearchFragment extends Fragment {
                 etDateUpper.setText(dateUpperParam);
             }
             if(popSearch){
-                etPopLower.setText(popLowerParam);
-                etPopUpper.setText(popUpperParam);
+                etPopLower.setText(Integer.toString(popLower));
+                etPopUpper.setText(Integer.toString(popUpper));
             }
             if(filterVisible){
                 layoutFilter.setVisibility(View.VISIBLE);
@@ -168,6 +169,7 @@ public class SearchFragment extends Fragment {
             if(cleanSearch){
                 swClean.setChecked(true);
             }
+            tvMsg.setVisibility(View.GONE);
         }
 
         adapter = new SongAdapter(getContext(),songs, MainActivity.songMode.SEARCH, SearchFragment.this);
@@ -218,6 +220,7 @@ public class SearchFragment extends Fragment {
                     if(checkDateInput(etDateLower.getText().toString(),etDateUpper.getText().toString())) {
                         dateLowerParam = etDateLower.getText().toString();
                         dateUpperParam = etDateUpper.getText().toString();
+                        dateSearch = true;
                     }
                     else{
                         Toast.makeText(getContext(),"date formatting issue",Toast.LENGTH_SHORT).show();
@@ -231,9 +234,16 @@ public class SearchFragment extends Fragment {
                 // if no lower param, set to 0
                 // if no upper param, set to 100
                 if(!etPopLower.getText().toString().isEmpty() && !etPopUpper.getText().toString().isEmpty()){
-                    popLowerParam = etPopLower.getText().toString();
-                    popUpperParam = etPopUpper.getText().toString();
+
+                    int temp1 = Integer.parseInt(etPopLower.getText().toString());
+                    int temp2 = Integer.parseInt(etPopUpper.getText().toString());
+                    if(!(temp1 < 0 || temp2 < 0 || temp1 > 100 || temp2 > 100)){
+                        popLower = temp1;
+                        popUpper = temp2;
+                    }
+
                     popSearch = true;
+
                 }else{
                     popSearch = false;
                 }
@@ -388,6 +398,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
+
         final MenuItem filterItem = menu.findItem(R.id.filter);
         filterItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -407,7 +418,7 @@ public class SearchFragment extends Fragment {
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 searchItem.collapseActionView();
-                tvFail.setVisibility(View.GONE);
+                tvMsg.setVisibility(View.VISIBLE);
                 notifyAdapter();
                 return false;
             }
@@ -439,7 +450,7 @@ public class SearchFragment extends Fragment {
 
     private void makeRequest (String query) {
 
-        tvFail.setVisibility(View.GONE);
+        tvMsg.setVisibility(View.GONE);
         progress.setVisibility(ProgressBar.VISIBLE);
 
         accessToken = ((MainActivity)this.getActivity()).getAccessTokenSpotify();
@@ -553,9 +564,9 @@ public class SearchFragment extends Fragment {
         }
 
         if(temp.isEmpty()){
-            tvFail.setVisibility(View.VISIBLE);
+            Looper.prepare();
+            Toast.makeText(getContext(),"no results for query. please try again.",Toast.LENGTH_LONG).show();
         }
-
 
         songs.clear();
         songs.addAll(temp);
@@ -568,10 +579,10 @@ public class SearchFragment extends Fragment {
 
         // make dummy Song objects to hold popularity
         Song song_lb = new Song();
-        song_lb.setPopularity(Integer.parseInt(popLowerParam));
+        song_lb.setPopularity(popLower);
 
         Song song_ub = new Song();
-        song_ub.setPopularity(Integer.parseInt(popUpperParam));
+        song_ub.setPopularity(popUpper);
 
         return rangeSearch(s, song_lb,song_ub, MainActivity.sortMode.POPULARITY);
 

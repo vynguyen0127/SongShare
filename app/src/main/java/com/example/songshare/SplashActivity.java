@@ -56,6 +56,7 @@ public class SplashActivity extends AppCompatActivity {
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request);
     }
+
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
